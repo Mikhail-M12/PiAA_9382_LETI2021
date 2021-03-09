@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
 
 //структура для квадратиков
 struct Square
@@ -11,64 +10,85 @@ struct Square
     int y;
 };
 
-//глобальные переменные
-int bigSquare[40][40];
-vector<Square> squareStack;
-vector<Square> resultStack;
+struct States
+{
+    int bigSquare[40][40];
+    std::vector<Square> squareStack;
+    std::vector<Square> resultStack;
+    States(int size)
+    {
+        for(int i = 0; i < size; i++)
+        {
+            for(int j = 0; j < size; j++)
+            {
+                bigSquare[i][j] = 0;
+            }
+        }
+    }
+};
 
 //функция для вывода квадрата
-void printSquare(int size){
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            printf("%2i ", bigSquare[i][j]);
+void printSquare(int size, States& states)
+{
+    for(int i = 0; i < size; i++)
+    {
+        for(int j = 0; j < size; j++)
+        {
+            std::cout.width(3);
+            std::cout << states.bigSquare[i][j] << " ";
         }
-        printf("\n");
+        std::cout << std::endl;
     }
 }
 
 //функция для вывода стека
-void printStack(const vector<Square>& st){
-    for(auto &square : st){
-        cout << "{" << square.x << ", " << square.y << ", " << square.size << "}, ";
+void printStack(const std::vector<Square>& st)
+{
+    for(auto &square : st)
+    {
+        std::cout << "{" << square.x << ", " << square.y << ", " << square.size << "}, ";
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
 
 //функция для вставки основных квадратов
-inline void insertSquare(Square mainSquare)
+inline void insertSquare(Square mainSquare, States &states)
 {
     for (int i = 0; i < mainSquare.size; ++i)
         for (int j = 0; j < mainSquare.size; ++j)
-            bigSquare[mainSquare.y + i][mainSquare.x + j] = squareStack.size()+1;
+            states.bigSquare[mainSquare.y + i][mainSquare.x + j] = states.squareStack.size()+1;
 }
 
 // функция для вставки квадратов, про которые мы точно не знаем какой их размер подойдет
-inline Square insertSquare(int bigSquareSize, Square square)
+inline Square insertSquare(int bigSquareSize, Square square, States &states)
 {
     square.size--;
 
     // находим максимальный размер, который подойдет квадрату
     int biggestSize = 1;
-    while (biggestSize < square.size && (square.x + biggestSize) < bigSquareSize && (square.y + biggestSize) < bigSquareSize && !bigSquare[square.y][square.x + biggestSize])
+    while ( biggestSize < square.size &&
+            (square.x + biggestSize) < bigSquareSize &&
+            (square.y + biggestSize) < bigSquareSize &&
+            !states.bigSquare[square.y][square.x + biggestSize] )
         biggestSize++;
     square.size = biggestSize;
 
     // вставляем квадрат
     for (int i = 0; i < square.size; ++i)
         for (int j = 0; j < square.size; ++j)
-            bigSquare[square.y + i][square.x + j] = squareStack.size()+1;
+            states.bigSquare[square.y + i][square.x + j] = states.squareStack.size()+1;
 
     return square;
 }
 
 // функция по нахождению места под новый квадрат
-inline Square emptyCell(int bigSquareSize)
+inline Square emptyCell(int bigSquareSize, States &states)
 {
     for (int i = 0; i < bigSquareSize; ++i)
         for (int j = 0; j < bigSquareSize; ++j)
             //существует не занятое место квадратом
-            if (bigSquare[i][j] == 0)
+            if (states.bigSquare[i][j] == 0)
                 return {0, j, i};
 
     // квадрат заполнен
@@ -76,55 +96,56 @@ inline Square emptyCell(int bigSquareSize)
 }
 
 //функция по добавлению основных квадратов
-inline void initialization(Square &square, int size)
+inline void initialization(Square &square, int size, States &states)
 {
     square = {(size + 1) / 2, 0, 0};
-    insertSquare(square);
-    squareStack.push_back(square);
+    insertSquare(square, states);
+    states.squareStack.push_back(square);
 
     square = {size - (size + 1) / 2, 0, (size + 1) / 2};
-    insertSquare(square);
-    squareStack.push_back(square);
+    insertSquare(square, states);
+    states.squareStack.push_back(square);
 
     square = {size - (size + 1) / 2, (size + 1) / 2, 0};
-    insertSquare(square);
-    squareStack.push_back(square);
+    insertSquare(square, states);
+    states.squareStack.push_back(square);
 
-    square = emptyCell(size);
+    square = emptyCell(size, states);
     square.size = size - 1;
 }
 
 //функция по удалению квадрата из стека и массива
-inline Square BackWard(const int &size)
+inline Square BackWard(States &states)
 {
     // вытаскиваем удаляемый квадрат из стека
-    Square lastSquare = squareStack.back();
-    squareStack.pop_back();
+    Square lastSquare = states.squareStack.back();
+    states.squareStack.pop_back();
 
     // очищаем квадрат
     for (int i = 0; i < lastSquare.size; i++)
         for (int j = 0; j < lastSquare.size; j++)
-            bigSquare[lastSquare.y + i][lastSquare.x + j] = 0;
+            states.bigSquare[lastSquare.y + i][lastSquare.x + j] = 0;
 
     return lastSquare;
 }
 
 // основная функция бектрекинга
-void doBackTracking(int size)
+void doBackTracking(int size, States &states)
 {
     Square tempSquare;
-    initialization(tempSquare, size);
+    initialization(tempSquare, size, states);
 
-    cout << "Запускаем поиск: " << endl;
+    std::cout << "Запускаем поиск: " << std::endl;
     while (true)
     {
         // если удалим один из трех основных квадратов то можно заканчивать перебор
-        if (squareStack.size() == 2){
-            cout << "Элементов в текущем стеке два, значит один из основных квадратов пришлось удалить," <<
-                    "заканчиваем поиск." << endl;
+        if (states.squareStack.size() == 2)
+        {
+            std::cout << "Элементов в текущем стеке два, значит один из основных квадратов пришлось удалить," <<
+                      "заканчиваем поиск." << std::endl;
             break;
         }
-        cout << "В текущем стеке " << squareStack.size() << " элементов" << endl;
+        std::cout << "В текущем стеке " << states.squareStack.size() << " элементов" << std::endl;
 
 
         bool full = false;
@@ -133,38 +154,40 @@ void doBackTracking(int size)
         while (!full)
         {
             // вставляем квадрат
-            squareStack.push_back(insertSquare(size, tempSquare));
-            cout << "Вставили квадрат размера " << squareStack.back().size << " на x: " << squareStack.back().x << " y: " << squareStack.back().y << endl;
-            printSquare(size);
+            states.squareStack.push_back(insertSquare(size, tempSquare, states));
+            std::cout << "Вставили квадрат размера " << states.squareStack.back().size << " на x: " << states.squareStack.back().x << " y: " << states.squareStack.back().y << std::endl;
+            printSquare(size, states);
 
             // если в текущем стеке уже столько же элементов, сколько и в результирующем, то дальше смысла двигаться нет
-            if (!resultStack.empty() && squareStack.size() >= resultStack.size())
+            if (!states.resultStack.empty() && states.squareStack.size() >= states.resultStack.size())
             {
-                cout << "В текущем стеке элементов больше чем в лучшем, дальше идти смысла нет" << endl;
+                std::cout << "В текущем стеке элементов больше чем в лучшем, дальше идти смысла нет" << std::endl;
                 break;
             }
 
             // ищем место под следующий квадрат
-            tempSquare = emptyCell(size);
-            if(tempSquare.size > -1) {
-                cout << "Нашли свободное место x:" << tempSquare.x << " y:" << tempSquare.y << " под следующий квадрат"
-                     << endl;
+            tempSquare = emptyCell(size, states);
+            if(tempSquare.size > -1)
+            {
+                std::cout << "Нашли свободное место x:" << tempSquare.x << " y:" << tempSquare.y << " под следующий квадрат"
+                          << std::endl;
             }
-            else {
-                cout << "Квадрат полностью заполнен." << endl;
+            else
+            {
+                std::cout << "Квадрат полностью заполнен." << std::endl;
             }
             full = tempSquare.size == -1;
             tempSquare.size = size - (size + 1) / 2;
         }
 
-        cout << "Минимальное количество квадратов: ";
-        (resultStack.empty() ? cout << "еще нет" : cout << resultStack.size()) << endl;
-        cout << "Текущее количество квадратов: " << squareStack.size() << endl;
+        std::cout << "Минимальное количество квадратов: ";
+        (states.resultStack.empty() ? std::cout << "еще нет" : std::cout << states.resultStack.size()) << std::endl;
+        std::cout << "Текущее количество квадратов: " << states.squareStack.size() << std::endl;
         // если квадрат заполнен и текущих элементов меньше лучших, изменим это
-        if (full && squareStack.size() < resultStack.size() || resultStack.empty())
+        if (full && states.squareStack.size() < states.resultStack.size() || states.resultStack.empty())
         {
-            cout << "Текущее количество квадратов оказалось меньше, получаем новый минимум равный: " << squareStack.size() << endl;
-            resultStack = squareStack;
+            std::cout << "Текущее количество квадратов оказалось меньше, получаем новый минимум равный: " << states.squareStack.size() << std::endl;
+            states.resultStack = states.squareStack;
         }
 
 
@@ -176,14 +199,17 @@ void doBackTracking(int size)
          * т.к. единичные квадраты в конце расставляются едиственным  способом, поэтому
          * можно удалить их, и следующий за ними квадрат
          */
-        cout << "Будем удалять элементы из стека {x,y,size}: " << endl;
-        printStack(squareStack);
+        std::cout << "Удалим поставленные последними единичные квадраты -- т.к. их можно поставить единственным способом" << std::endl;
+        std::cout << "Также в независимости есть ли ед.квадратики удалим следующий за ними не единичный квадрат" << std::endl;
+        std::cout << "Стек{x,y,size} до удаления: " << std::endl;
+        printStack(states.squareStack);
         do
         {
-            tempSquare = BackWard(size);
-        } while (squareStack.size() > 2 && tempSquare.size == 1);
-        cout << "Стек после удаления: " << endl;
-        printStack(squareStack);
+            tempSquare = BackWard(states);
+        }
+        while (states.squareStack.size() > 2 && tempSquare.size == 1);
+        std::cout << "Стек после удаления: " << std::endl;
+        printStack(states.squareStack);
     }
 }
 
@@ -192,17 +218,18 @@ void doBackTracking(int size)
 int main()
 {
     int size;
-    cout << "Введите сторону квадрата: ";
-    cin >> size;
+    std::cout << "Введите сторону квадрата: " << std::endl;
+    std::cin >> size;
+
 
     //квадраты с четными сторонами всегда можно разделить на 4 равных
     if (size % 2 == 0)
     {
-        cout << 4 << endl;
-        cout << 1 << " " << 1 << " " << size / 2 << endl;
-        cout << size / 2 + 1 << " " << 1 << " " << size / 2 << endl;
-        cout << 1 << " " << size / 2 + 1 << " " << size / 2 << endl;
-        cout << size / 2 + 1 << " " << size / 2 + 1 << " " << size / 2;
+        std::cout << 4 << std::endl;
+        std::cout << 1 << " " << 1 << " " << size / 2 << std::endl;
+        std::cout << size / 2 + 1 << " " << 1 << " " << size / 2 << std::endl;
+        std::cout << 1 << " " << size / 2 + 1 << " " << size / 2 << std::endl;
+        std::cout << size / 2 + 1 << " " << size / 2 + 1 << " " << size / 2;
         return 0;
     }
 
@@ -219,10 +246,12 @@ int main()
         }
     }
 
-    doBackTracking(size);
+    States states(size);
 
-    cout << endl << resultStack.size() << endl;
-    for (auto &square : resultStack)
-        cout << square.x * divider + 1 << " " << square.y * divider + 1 << " " << square.size * divider << endl;
+    doBackTracking(size, states);
+
+    std::cout << std::endl << states.resultStack.size() << std::endl;
+    for (auto &square : states.resultStack)
+        std::cout << square.x * divider + 1 << " " << square.y * divider + 1 << " " << square.size * divider << std::endl;
     return 0;
 }

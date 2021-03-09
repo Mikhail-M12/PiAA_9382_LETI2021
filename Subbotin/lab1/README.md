@@ -1,3 +1,2 @@
-    >>cd src
-    >>g++ -std=c++2a main.cpp -o lab1
-    >>./lab1
+make -- для компиляции
+sh auto.sh -- для запуска тестов, результаты появятся в папке results
