@@ -12,7 +12,7 @@ struct Square
 
 struct States
 {
-    int bigSquare[40][40];
+    std::array<std::array<int,40>,40> bigSquare;
     std::vector<Square> squareStack;
     std::vector<Square> resultStack;
     States(int size)
