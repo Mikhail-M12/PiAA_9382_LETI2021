@@ -120,7 +120,7 @@ void Handler::PopBackVector(int** matrix, int matrix_size, std::vector<Square>& 
             else{//deletethe last value in vector
                 vector.pop_back();
                 vector_size-=1;
-                this->SetSquare(matrix, matrix_size, square.GetXCoordinate(), square.GetYCoordinate(), square.GetSize(), 1);
+                this->SetSquare(matrix, matrix_size, square.GetXCoordinate(), square.GetYCoordinate(), square.GetSize(), 0);
                 count+=4;
                 continue;
             }
