@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <ctime>
 
 
 // Данная переменная отвечает за уровень рекурсии в данный момент времени
@@ -156,6 +155,8 @@ public:
         for (int y = 0; y < _size; ++y) {
             for (int x = 0; x < _size; ++x) {
                 if (_array[y][x]) {
+                    // координаты и размер домножаются на коэф. сжатия, чтобы получить
+                    // их верное значение
                     auto size = std::to_string(_array[y][x] * _compression);
                     auto transformedX = std::to_string(x * _compression + 1);
                     auto transformedY = std::to_string(y * _compression + 1);
@@ -169,6 +170,26 @@ public:
             }
         }
         return text;
+    }
+
+    void print(const std::string& innerMessage) {
+
+        std::cout << "-------" << innerMessage <<  "-------" << std::endl;
+
+        // вывод элементов матрицы
+
+        for (int i = 0; i < _size; ++i) {
+            for (int j = 0; j < _size; ++j)
+                std::cout << _array[i][j] << " ";
+            std::cout << std::endl;
+        }
+
+        auto closeMsg = std::string();
+        // формирование закрывающего сообщения
+        for (int i = 0; i < 14 + innerMessage.length(); ++i) closeMsg += "-";
+
+        std::cout << closeMsg << std::endl;
+
     }
 };
 
@@ -188,9 +209,11 @@ class SquareSolver {
         int compressedSize = size;
 
         for (int delimiter = size / 2; delimiter > 1; --delimiter) {
+            // перебор делителей от большего к меньшему
             if (!(size % delimiter)) {
                 compression = delimiter;
                 compressedSize = size / delimiter;
+                // если нашли делитель, то он будет максимальным
                 break;
             }
         }
@@ -210,8 +233,10 @@ class SquareSolver {
         std::cout << "Инициализация оптимальной карты" << std::endl;
 
         _optimalMap->insertSquare(0, 0, _size - 1);
+        // окружаем квадрат N-1 единичными квадратами по правой части
         for (int y = 0; y < _size; ++y)
             _optimalMap->insertSquare(_size - 1, y, 1);
+        // окружаем квадрат N-1 единичными квадратами по нижней части
         for (int x = 0; x < _size - 1; ++x)
             _optimalMap->insertSquare(x, _size - 1, 1);
 
@@ -265,6 +290,7 @@ class SquareSolver {
 
         for (int size = _size / 2; size > 0; --size) {
             if (_currentMap->canSetSquare(x, y, size)) {
+                // если можем поставить квадрат, ставим его
                 _currentMap->insertSquare(x, y, size);
 
                 MessagePrinter::tryToSetSquare(x, y, size, true);
@@ -272,25 +298,15 @@ class SquareSolver {
                 int copyX = x;
                 int copyY = y;
 
-                // На данной позиции уже поставлен квадрат
-                // Теперь необходимо проверить, осталось ли пустое пространство в карте перебора
-                // Если пространство осталось, то в переменные copyX и copyY будет записана первая
-                // найденная клетка, где ничего не стоит
-                // Из этой клетки вновь запускается рекурсивная функция перебора
-
-                // Если пустого пространства нет, то карта заполнена и необходимо
-                // сравнить кол-во квадратов в карте перебора и в оптимальной карте
-                // Если в карте перебора оказывается меньше квадратов, то она становится оптимальной
-
-                // Затем поставленный квадрат удаляется из карты перебора для дальнейшего перебора
-                // размера квадрата, который можно поставить
-
                 bool isThereEmpty = _currentMap->isThereEmpty(copyX, copyY);
+                // ищем свободную клетку
                 if (!isThereEmpty) {
-
+                    // если нет свободной клетки, квадрат заполнен
                     MessagePrinter::isThereEmpty(x, y, false);
 
                     if (_currentMap->countSquares() < _optimalMap->countSquares()) {
+                        // смотрим, больше ли квадратов в оптимальной карте
+                        // если больше, то ставим текущую карту как оптимальную
                         MessagePrinter::currentLessOptimal(x, y, true, _currentMap->countSquares(), _optimalMap->countSquares());
                         *_optimalMap = *_currentMap;
                     } else MessagePrinter::currentLessOptimal(x, y, false, _currentMap->countSquares(), _optimalMap->countSquares());
@@ -303,6 +319,7 @@ class SquareSolver {
                     RECURSION_LEVEL -- ;
                 }
 
+                // удаляем квадрат, который поставили, чтобы перебирать дальше
                 _currentMap->removeSquare(x, y, size);
                 MessagePrinter::removeSquare(x, y, size);
             } else MessagePrinter::tryToSetSquare(x, y, size, false);
@@ -319,11 +336,23 @@ public:
     }
 
     SquareMap* solve() {
-        if (!(_size % 2)) _solveEvenSquare();
+        if (!(_size % 2)) _solveEvenSquare(); // если квадрат с четной стороной, то для него подготовлено
+                                              // отдельное решение
         else {
+
+            // инициализируем карты перебора и оптимальную
             _initOptimalMap();
             _initCurrentMap();
+
+            std::cout << "Визуализация карты перебора и оптимальной карты после инициализации:" << std::endl;
+            _optimalMap->print("Optimal Map");
+            _currentMap->print("Current Map");
+
             _solve(_size / 2 + 1, _size / 2);
+
+            std::cout << "Визуализация оптимальной карты после решения" << std::endl;
+            _optimalMap->print("Optimal Map");
+
         }
         return _optimalMap;
     }
