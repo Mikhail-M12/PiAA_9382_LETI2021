@@ -1,17 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <array>
 
-#include <string>
-
-#define space std::string("\n____________________________________________\n");
 
 int choise = 1;
 
-void print(const char *message) {
-    if (choise == 1) {
-        std::cout << message;
-    }
-}
+
+
 
 struct Cell {
     int size;
@@ -21,26 +16,14 @@ struct Cell {
 class Square {
 public:
 
-    Square(int size) {
+    Square(int size,int comp) {
         this->size = size;
+        this->comp = comp;
         count = 0;
-        map = new int *[size];
-        for (int i = 0; i < size; ++i) {
-            map[i] = new int[size];
-        }
-        for (int i = 0; i < size; ++i) {
-            for (int j = 0; j < size; ++j) {
-                map[i][j] = 0;
-            }
-        }
         ++countOp;
     }
 
     ~Square() {
-        for (int i = 0; i < size; ++i) {
-            delete[] map[i];
-        }
-        delete[] map;
     }
 
     void setSquare(int x, int y, int size) {
@@ -55,7 +38,7 @@ public:
         newSquare.y = y;
         newSquare.size = size;
         squareStack.push_back(newSquare);
-        countOp += 4 + (size -1)*(size-1);
+        countOp += 4 + (size - 1) * (size - 1);
     }
 
     int canSetSquareinRange(Cell range) {
@@ -80,7 +63,7 @@ public:
         }
         Cell temp = squareStack.back();
         squareStack.pop_back();
-        countOp += 3 + (size-1)*(size-1);
+        countOp += 3 + (size - 1) * (size - 1);
         return temp;
     }
 
@@ -105,7 +88,7 @@ public:
     }
 
     Square *copy() {
-        Square *newSq = new Square(this->size);
+        Square *newSq = new Square(this->size,this->comp);
         for (int i = 0; i < this->size; ++i) {
             for (int j = 0; j < this->size; ++j) {
                 newSq->map[i][j] = this->map[i][j];
@@ -113,24 +96,61 @@ public:
         }
         newSq->count = this->count;
         newSq->squareStack = this->squareStack;
-        countOp += 3 + ((size - 1) * (size -1));
+        countOp += 3 + ((size - 1) * (size - 1));
         return newSq;
     }
 
-    int **map;
+    std::array<std::array<int,30>,30> map;
     std::vector<Cell> squareStack; //стек наших кубиков.
     int size;                      //размер полатна
     int count;                     // счетчик квадратов
+    int comp;
     int countOp = 0;
 };
+
+//template<typename Type>
+void printMessage(const char* message){
+    if (choise == 1) {
+        std::cout<<message;
+    }
+}
+
+void printSquare(Square *some, bool flagIsMap) {
+    //bool is_same_v = std::is_same < Type, Square > :: value ;
+    if (choise == 1) {
+      if ( flagIsMap) {
+
+            for (int i = 0; i < some->size; ++i) {
+                for (int j = 0; j < some->size; ++j) {
+                    std::cout << some->map[i][j] << " ";
+                }
+                std::cout << "\n";
+            }
+
+        } else {
+            for (int i = 0; i < some->squareStack.size(); ++i) {
+                std::cout << some->squareStack[i].x * some->comp + 1 << " "
+                          << some->squareStack[i].y * some->comp + 1 << " "
+                          << some->squareStack[i].size * some->comp << "\n";
+            }
+        }
+    }
+
+}
+
 
 class Solve {
 public:
     Solve(int size) {
         comp = 1;
         this->size = compression(size, comp);
-        curMap = new Square(size);
-        easyMap = new Square(size);
+        curMap = new Square(size,comp);
+        easyMap = new Square(size,comp);
+    }
+
+    ~Solve() {
+        delete curMap;
+        delete easyMap;
     }
 
     int compression(int size, int &comp) {
@@ -139,11 +159,11 @@ public:
             if (!(size % i)) {
                 comp = i;
                 compSize = size / i;
-                countop +=2;
+                countop += 2;
                 break;
             }
         }
-        countop += 1 + (size-2);
+        countop += 1 + (size - 2);
         return compSize;
     }
 
@@ -165,45 +185,25 @@ public:
         curMap->setSquare(0, size / 2 + 1, size / 2);
     }
 
-    void printStak() {
-        if (choise) {
-            for (int i = 0; i < curMap->squareStack.size(); ++i) {
-                std::cout << easyMap->squareStack[i].x * comp + 1 << " "
-                          << easyMap->squareStack[i].y * comp + 1 << " "
-                          << easyMap->squareStack[i].size * comp << "\n";
-            }
-        }
-    }
-
-    void printMap(Square *a) {
-        if (choise) {
-            for (int i = 0; i < size; ++i) {
-                for (int j = 0; j < size; ++j) {
-                    std::cout << a->map[i][j] << " ";
-                }
-                std::cout << "\n";
-            }
-        }
-    }
 
     void solve() {
         currentMap();
-        print("Add 3 square with this parameters:\nx y size|\n");
-        printStak();
-        print("This is the most optimal way.\n\nVisualization:\n");
-        printMap(curMap);
+        printMessage("Add 3 square with this parameters:\nx y size|\n");
+        printSquare(easyMap,0);
+        printMessage("This is the most optimal way.\n\nVisualization:\n");
+        printSquare(curMap,1);
         int x = size / 2 + 1;
         int y = size / 2;
         curMap->countOp += 2;
 
         Cell tempS;
 
-        print("\nTry find free space...\n");
+        printMessage("\nTry find free space...\n");
         tempS = curMap->whereEmpty(x, y);
         tempS.size = size - 1;
         int sizeOfCanSet;
         curMap->countOp += 3;
-        print("Found an empty space on: ");
+        printMessage("Found an empty space on: ");
 
         if (choise) {
             std::cout << "{ " << tempS.x + 1 << ", " << tempS.y + 1 << " }\n";
@@ -211,9 +211,9 @@ public:
 
         while (true) {
             curMap->countOp += 2;
-            print("The big cycle has begun...\n");
+            printMessage("The big cycle has begun...\n");
             if (curMap->count == 2) {
-                print("Removed the 3-d square. \nIt makes no sense to continue "
+                printMessage("Removed the 3-d square. \nIt makes no sense to continue "
                       "further, all the best options have already been found.\n");
                 break;
             }
@@ -223,13 +223,13 @@ public:
             while (!full) {
 
                 //¬ыбираем самый большой квадрат который можно вставить в эту область.
-                print("\n\tThe cycle of filling has begun...\n");
+                printMessage("\n\tThe cycle of filling has begun...\n");
                 sizeOfCanSet = curMap->canSetSquareinRange(tempS);
                 if (choise) {
-                    print("\tWe are looking for the largest square that can be put on: ");
+                    printMessage("\tWe are looking for the largest square that can be put on: ");
                     std::cout << "{ " << tempS.x + 1 << ", " << tempS.y + 1
                               << " } in range " << tempS.size << ", ";
-                    print("this is it: ->");
+                    printMessage("this is it: ->");
 
                     std::cout << " " << sizeOfCanSet << "\n";
                 }
@@ -237,36 +237,36 @@ public:
                 // insert square
 
                 curMap->setSquare(tempS.x, tempS.y, sizeOfCanSet);
-                print("\tSet a square to these coordinates:\n\tx y size\n");
+                printMessage("\tSet a square to these coordinates:\n\tx y size\n");
                 if (choise) {
                     std::cout << "\t" << curMap->squareStack.back().x * comp + 1 << " "
                               << curMap->squareStack.back().y * comp + 1 << " "
                               << curMap->squareStack.back().size * comp
                               << "\n\n\tVisualization:\n";
                 }
-                printMap(curMap);
+                printSquare(curMap,1);
 
                 //≈сли кол-во квадратов в текущем больше или равно лучшего варианта. Ќе
                 //продолжать. —мысла нет.
 
                 if (curMap->count >= easyMap->count) {
-                    print("\tThe number of squares in the new case is more than in the "
+                    printMessage("\tThe number of squares in the new case is more than in the "
                           "best.\nExit the fill cycle\n");
                     break;
                 }
 
 
-                print("\n\tTry find free space...\n");
+                printMessage("\n\tTry find free space...\n");
                 tempS = curMap->whereEmpty(x, y);
 
                 if (tempS.size == -1) {
                     full = true;
                     ++curMap->countOp;
-                    print("\tNot found an empty space.\nExit the fill cycle\n");
+                    printMessage("\tNot found an empty space.\nExit the fill cycle\n");
 
                 } else {
 
-                    print("\tFound an empty space on: ");
+                    printMessage("\tFound an empty space on: ");
                     if (choise) {
                         std::cout << "{ " << tempS.x + 1 << ", " << tempS.y + 1 << " }\n";
                     }
@@ -284,16 +284,16 @@ public:
                 ++curMap->countOp;
                 easyMap = curMap->copy();
 
-                print("Copied the new version to the best one. Since there are fewer "
+                printMessage("Copied the new version to the best one. Since there are fewer "
                       "squares\n\nVisualization new Best Map:\n");
-                printMap(curMap);
+                printSquare(curMap,1);
             }
 
-            print("\n______________________________Remove to try new "
+            printMessage("\n______________________________Remove to try new "
                   "Map____________________________\nCycle removed start!\n");
             do {
                 curMap->countOp += 6;
-                print("\nRemove square at this pos:\nx y size\n");
+                printMessage("\nRemove square at this pos:\nx y size\n");
                 if (choise) {
                     std::cout << curMap->squareStack.back().x * comp + 1 << " "
                               << curMap->squareStack.back().y * comp + 1 << " "
@@ -303,12 +303,12 @@ public:
                 tempS = curMap->removeSquare(curMap->squareStack.back().x,
                                              curMap->squareStack.back().y,
                                              curMap->squareStack.back().size);
-                printMap(curMap);
-                print("\n||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                printSquare(curMap,1);
+                printMessage("\n||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
                       "||||||||||||||||||||\n");
             } while (curMap->count > 2 && tempS.size == 1);
             curMap->countOp += 5;
-            print("\nCycle removed end.\n______________________________________End "
+            printMessage("\nCycle removed end.\n______________________________________End "
                   "Removing__________________________________\n");
         }
     }
@@ -323,11 +323,11 @@ public:
 
     void fillSquare() {
 
-        print("Getting started filling the "
+        printMessage("Getting started filling the "
               "square!\n___________________________________\n");
         if (!(this->size % 2)) {
             curMap->countOp += 1;
-            print("The side is even!\n When the side is even, the square is divided "
+            printMessage("The side is even!\n When the side is even, the square is divided "
                   "into 4 equal squares. This will be the answer.\n");
             solveEven();
 
@@ -346,21 +346,13 @@ public:
     int comp; //сжатие дл€ четной стороны квадрата. » дл€ нечетной не простой
     //стороны
     int size;
-    int countop=0;
+    int countop = 0;
 
 private:
 };
 
-void printAnswer(Solve b) {
-    std::cout << "Count squares:  " << b.easyMap->count
-              << "\nCords->\nx y size\n";
 
-    for (int i = 0; i < b.easyMap->squareStack.size(); ++i) {
-        std::cout << b.easyMap->squareStack[i].x * b.comp + 1 << " "
-                  << b.easyMap->squareStack[i].y * b.comp + 1 << " "
-                  << b.easyMap->squareStack[i].size * b.comp << "\n";
-    }
-}
+
 
 int main() {
     int SizeOfSide;
@@ -381,11 +373,11 @@ int main() {
     std::cout << "Created a square with a side " << SizeOfSide << ".\n";
     ml.fillSquare();
 
-    std::cout << "\nResult!" << space;
-    printAnswer(ml);
-    std::cout <<"\n count operation: " <<ml.easyMap->countOp<<"\n";
+    std::cout << "\nResult!" << "\n____________________________________________________\n";
+    printSquare(ml.easyMap,0);
+    std::cout << "\n count operation: " << ml.easyMap->countOp << "\n";
     std::cout << "\nBest map is:\n";
-    
-    ml.printMap(ml.easyMap);
+
+    printSquare(ml.easyMap,1);
     return 0;
 }
