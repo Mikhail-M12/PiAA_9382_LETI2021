@@ -10,6 +10,12 @@ struct Square{
     int length;
 };
 
+struct Point{
+    int x;
+    int y;
+    int res;
+};
+
 //Проверка кратнности
 int multiplicity(int n){
     if(n % 2 == 0 && n != 2)
@@ -56,20 +62,23 @@ void stackCopy(std::stack <Square> * stackSquares, std::stack <Square> * stackSq
 }
 
 // Нахождение пустой клетки
-int findEmptyCell(int **squareArray, int &x, int &y, int n){
-    for(x = 0; x < n; x++){
-        for(y = 0; y < n - 1; y++)
-            if(squareArray[x][y] == 0)
+Point findEmptyCell(int **squareArray, Point p, int n){
+    for(p.x = 0; p.x < n; p.x++){
+        for(p.y = 0; p.y < n - 1; p.y++)
+            if(squareArray[p.x][p.y] == 0)
                 break;
-        if(squareArray[x][y] == 0)
+        if(squareArray[p.x][p.y] == 0)
             break;
     }
-    if(x == n){
-        x = n - 1;
+    if(p.x == n){
+        p.x = n - 1;
     }
-    if(squareArray[x][y] != 0)
-        return 1;
-    return 0;
+    if(squareArray[p.x][p.y] != 0) {
+        p.res = 1;
+        return p;
+    }
+    p.res=0;
+    return p;
 }
 
 //Опустащает стек
@@ -95,7 +104,11 @@ int findMinSqrs(int limit, std::stack <Square> *stackSquares, int **squareArray,
     }
     demonstration(squareArray, n);//Вывод заполненности квадрата
     int x, y;
-    if(findEmptyCell(squareArray, x, y, n)) // Нахождение пустой клетки
+    Point p;
+    p = findEmptyCell(squareArray, p, n);
+    x = p.x;
+    y = p.y;
+    if(p.res) // Нахождение пустой клетки
     {
         std::cout << "Пустых клеток не осталось." << std::endl;
         return 0;
@@ -106,7 +119,10 @@ int findMinSqrs(int limit, std::stack <Square> *stackSquares, int **squareArray,
     std::stack <Square> stackSquaresMin;//Итоговый стек квадратов
     int distanceToTheBorder = (n - x > n - y) ? (n - y - !squareArray[0][0]) : (n - x - !squareArray[0][0]); //Хранит расстояние до границы
     std::cout << "Расстояние до границ = " << distanceToTheBorder << std::endl;
-    int lengthSquare, minCount = limit + 1, k, need_length = 1;
+    int lengthSquare;
+    int minCount = limit + 1;
+    int k;
+    int need_length = 1;
     std::cout << "Перебер длин квадрата:" << std::endl;
     for(lengthSquare = 1; lengthSquare <= distanceToTheBorder; lengthSquare++){ //Пробегает по длине квадрата
         std::cout << "Текущая длина: " << lengthSquare << std::endl;
@@ -142,6 +158,12 @@ int findMinSqrs(int limit, std::stack <Square> *stackSquares, int **squareArray,
     return minCount;
 }
 
+void deleteArray(int** array, int n){
+    for(int i = 0; i < n; i++)
+        delete [] array[i];
+    delete array;
+}
+
 int main(){
     int n, minCount;
     std::cout << "Введите длину квадрата, для которого вы хотите получить минимальное распределение" << std::endl;
@@ -152,7 +174,7 @@ int main(){
     }
     std::stack <Square> stackSquares;
     int mul = multiplicity(n);
-    int limit = 6.37 * sqrt(sqrt((mul == 1) ? n : mul));//Задаем предельную величину для количества квадратов
+    int limit = 2* M_PI * sqrt(sqrt((mul == 1) ? n : mul));//Задаем предельную величину для количества квадратов
     int **squareArray ;
 
     if(mul!=1){
@@ -186,69 +208,10 @@ int main(){
         stackSquares.pop();
     }
     if(mul!=1){
-        for(int i = 0; i < mul; i++)
-            delete [] squareArray[i];
+        deleteArray(squareArray, mul);
     }
     else{
-        for(int i = 0; i < n; i++)
-            delete [] squareArray[i];
+        deleteArray(squareArray, n);
     }
-    delete [] squareArray;
     return 0;
-}
-
-extern "C"{
-    int autoTest(int n){
-        int  minCount;
-        if(!(n>=2 && n<=40)){
-            std::cout << "Ошибка, введено неверное число." << std::endl;
-            return 0;
-        }
-        std::stack <Square> stackSquares;
-        int mul = multiplicity(n);
-        int limit = 6.37 * sqrt(sqrt((mul == 1) ? n : mul));//Задаем предельную величину для количества квадратов
-        int **squareArray ;
-
-        if(mul!=1){
-            squareArray = new int *[mul];
-            for(int i = 0; i < mul; i++)
-                squareArray[i] = new int[mul]();
-            minCount = findMinSqrs(limit, &stackSquares, squareArray, mul, 0, n / mul);
-        }
-        else {
-            squareArray = new int *[n];
-            for(int i = 0; i < n; i++)
-                squareArray[i] = new int[n]();
-
-            int half = n - n / 2;
-            fillSquare(squareArray, 0, 0, half);
-            fillSquare(squareArray, half, 0, half - 1);
-            fillSquare(squareArray, 0, half, half - 1);
-
-            minCount = findMinSqrs(limit - 3, &stackSquares, squareArray, n, 0, 1) + 3;
-            stackSquares.push({half + 1, 1, half - 1});
-            stackSquares.push({1, half + 1, half - 1});
-            stackSquares.push({1, 1, half});
-        }
-
-        Square tmp;
-        std::cout << "Для квадрата стороной " << n << std::endl;
-        std::cout << "Количество = " << minCount << std::endl;
-        std::cout << "Минимальное распределение квадратов:" << std::endl;
-        for(int j = 0; j < minCount; j++){
-            tmp = stackSquares.top();
-            std::cout << j + 1 << ") x = " << tmp.x << ", y = " << tmp.y << ", длина = " << tmp.length << std::endl;
-            stackSquares.pop();
-        }
-        if(mul!=1){
-            for(int i = 0; i < mul; i++)
-                delete [] squareArray[i];
-        }
-        else{
-            for(int i = 0; i < n; i++)
-                delete [] squareArray[i];
-        }
-        delete [] squareArray;
-        return 0;
-    }
 }
