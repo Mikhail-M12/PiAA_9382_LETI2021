@@ -1,0 +1,8 @@
+Жадный алгоритм
+https://repl.it/@lastrise/GreedyPiAA2#main.py
+
+A*
+https://repl.it/@lastrise/APiAA2#main.py
+
+Сначала вводится граф, затем для каждой вершины считывается эвристическая функция (если A*)
+После ввода графа необходимо нажать CTRL + D (EOF)
