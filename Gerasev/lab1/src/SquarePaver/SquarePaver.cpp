@@ -108,21 +108,30 @@ public:
             Square lastSquare;
             while ((firstFree.x != -1 && possibleToFindBetterPaving()))
             {
-                // std::cout << "firstFree -- (" << firstFree.x << ", " << firstFree.y << ")\n";
-                // view();
+                std::cout << "found free place for square -- (" << firstFree.x << ", " << firstFree.y << ")\n";
                 unsigned int currentMaxSize = squarePavingMap.giveMaxSquareSize(firstFree);
                 lastSquare = Square{(unsigned int) firstFree.x, (unsigned int) firstFree.y, currentMaxSize};
+
+                std::cout << "Placing square...\n";
+                std::cout << "Now the system state looks like this:\n\n";
+                view();
+                std::cout << "\nEnd of state\n\n";
                 addSquare(lastSquare);
                 firstFree = squarePavingMap.giveFirstFree();
             }
-            // view();
+            std::cout << "It's impossible to make progress now\n";
+                
 
             if (bestPaving.size() == 0 || bestPaving.size() > currentPaving.size())
             {
+                std::cout << "Better paving has been found\n";
                 updatePaving();
             }
             
             // What to do when the map is filled? Delete all squares == 1 and one square after that
+
+            std::cout << "Deleting small squares... and one behind them\n";
+
             removeLastSmallSquares();
 
             if (currentPaving.size() <= 3) // Small optimtsation
@@ -155,6 +164,7 @@ int main()
 
     SquarePaver squarePaver(n);
     squarePaver.findBestPaving();
+    std::cout << "The answer was found\n";
     squarePaver.viewFancyWay(modifier);
 
     return 0;
