@@ -1,21 +1,20 @@
 #include <iostream>
 #include <vector>
-using namespace std;
 
 int N;
 int minCounter;
-vector<pair<int, pair<int, int>>> resArr;
+std::vector<std::pair<int, std::pair<int, int>>> resArr;
 
 void printAnswer(int scale = 1)
 {
-    cout << minCounter << '\n';
+    std::cout << minCounter << '\n';
     for (int i = 0; i < minCounter; i++)
     {
-        cout << resArr[i].second.first * scale + 1 << ' ' << resArr[i].second.second * scale + 1 << ' ' << resArr[i].first * scale << '\n';
+        std::cout << resArr[i].second.first * scale + 1 << ' ' << resArr[i].second.second * scale + 1 << ' ' << resArr[i].first * scale << '\n';
     }
 }
 
-void insertBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
+void insertBlock(std::vector<std::vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
 {
     for (int i = 0; i < m; i++)
     {
@@ -26,7 +25,7 @@ void insertBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вста�
     }
 }
 
-void removeBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
+void removeBlock(std::vector<std::vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
 {
     for (int i = 0; i < m; i++)
     {
@@ -37,38 +36,38 @@ void removeBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вста�
     }
 }
 
-pair<int, int> findEmpty(vector<vector<bool>>& mainArr) //Поиск первой свободной ячейки для вставки
+std::pair<int, int> findEmpty(std::vector<std::vector<bool>>& mainArr) //Поиск первой свободной ячейки для вставки
 {
     for (int i = N / 2; i < N; i++)
     {
         for (int j = N / 2; j < N; j++)
         {
             if (!mainArr[i][j])
-                return make_pair(i, j);
+                return std::make_pair(i, j);
         }
     }
-    return make_pair(-1, -1);
+    return std::make_pair(-1, -1);
 }
 
-pair<int, bool> findMaxSize(vector<vector<bool>>& mainArr, int x, int y)
+std::pair<int, bool> findMaxSize(std::vector<std::vector<bool>>& mainArr, int x, int y)
 {
     for (int i = y + 1; i < N; i++)
     {
         if (mainArr[x][i])
         {
             if (N - x == i - y)
-                return make_pair(N - x, true);
-            return make_pair((N - x > i - y) ? i - y : N - x, false);
+                return std::make_pair(N - x, true);
+            return std::make_pair((N - x > i - y) ? i - y : N - x, false);
         }
     }
     if (N - x == N - y)
-        return make_pair(N - x, true);
-    return make_pair((N - x > N - y) ? N - y : N - x, false);
+        return std::make_pair(N - x, true);
+    return std::make_pair((N - x > N - y) ? N - y : N - x, false);
 }
 
-void chooseBlock(vector<vector<bool>>& mainArr, vector<pair<int, pair<int, int>>>& tmpArr, int counter, int x, int y)
+void chooseBlock(std::vector<std::vector<bool>>& mainArr, std::vector<std::pair<int, std::pair<int, int>>>& tmpArr, int counter, int x, int y)
 {
-    pair<int, int> coord = findEmpty(mainArr);
+    std::pair<int, int> coord = findEmpty(mainArr);
     if (coord.first == -1)
     {
         if (tmpArr.size() < minCounter)
@@ -84,7 +83,7 @@ void chooseBlock(vector<vector<bool>>& mainArr, vector<pair<int, pair<int, int>>
     }
     int tmpBestCounter = minCounter;
     //поиск места для вставки блока
-    pair<int, bool> maxSize = findMaxSize(mainArr, coord.first, coord.second); //поиск максимального размера блока для вставки на найденное пустое место
+    std::pair<int, bool> maxSize = findMaxSize(mainArr, coord.first, coord.second); //поиск максимального размера блока для вставки на найденное пустое место
     if (maxSize.second)                                                        //Если можно вставить сразу блок максимального размера
     {
         tmpArr.push_back(make_pair(maxSize.first, coord));
@@ -108,17 +107,17 @@ void chooseBlock(vector<vector<bool>>& mainArr, vector<pair<int, pair<int, int>>
     }
 }
 
-void primeNumber(vector<vector<bool>>& mainArr) //вставка начальных блоков и начало работы бэктрекинга
+void primeNumber(std::vector<std::vector<bool>>& mainArr) //вставка начальных блоков и начало работы бэктрекинга
 {
     insertBlock(mainArr, N / 2 + 1, 0, 0);
     insertBlock(mainArr, N / 2, N / 2 + 1, 0);
     insertBlock(mainArr, N / 2, 0, N / 2 + 1);
     int counter = 3;
     int minCounter = N * N;
-    vector<pair<int, pair<int, int>>> tmpArr;
-    tmpArr.push_back(make_pair(N / 2 + 1, make_pair(0, 0)));
-    tmpArr.push_back(make_pair(N / 2, make_pair(N / 2 + 1, 0)));
-    tmpArr.push_back(make_pair(N / 2, make_pair(0, N / 2 + 1)));
+    std::vector<std::pair<int, std::pair<int, int>>> tmpArr;
+    tmpArr.push_back(std::make_pair(N / 2 + 1, std::make_pair(0, 0)));
+    tmpArr.push_back(std::make_pair(N / 2, std::make_pair(N / 2 + 1, 0)));
+    tmpArr.push_back(std::make_pair(N / 2, std::make_pair(0, N / 2 + 1)));
     chooseBlock(mainArr, tmpArr, counter, N / 2, N / 2);
 }
 
@@ -127,15 +126,15 @@ void division2()
     if (N % 2 == 0)
     {
         int N_div = N / 2;
-        cout << 4 << '\n';
-        cout << 1 << ' ' << 1 << ' ' << N_div << '\n';
-        cout << N_div + 1 << ' ' << 1 << ' ' << N_div << '\n';
-        cout << 1 << ' ' << N_div + 1 << ' ' << N_div << '\n';
-        cout << N_div + 1 << ' ' << N_div + 1 << ' ' << N_div << '\n';
+        std::cout << 4 << '\n';
+        std::cout << 1 << ' ' << 1 << ' ' << N_div << '\n';
+        std::cout << N_div + 1 << ' ' << 1 << ' ' << N_div << '\n';
+        std::cout << 1 << ' ' << N_div + 1 << ' ' << N_div << '\n';
+        std::cout << N_div + 1 << ' ' << N_div + 1 << ' ' << N_div << '\n';
     }
 }
 
-void division3(vector<vector<bool>>& mainArr)
+void division3(std::vector<std::vector<bool>>& mainArr)
 {
     int realN = N;
     int scale = N / 3;
@@ -144,7 +143,7 @@ void division3(vector<vector<bool>>& mainArr)
     printAnswer(scale);
 }
 
-void division5(vector<vector<bool>>& mainArr)
+void division5(std::vector<std::vector<bool>>& mainArr)
 {
     int realN = N;
     int scale = N / 5;
@@ -155,7 +154,7 @@ void division5(vector<vector<bool>>& mainArr)
 
 int main()
 {
-    cin >> N;
+    std::cin >> N;
     minCounter = N * N;
     if (N % 2 == 0)
     {
@@ -163,7 +162,7 @@ int main()
         return 0;
     }
     //создание "карты" столешницы
-    vector<vector<bool>> mainArr(N);
+    std::vector<std::vector<bool>> mainArr(N);
     for (int i = 0; i < N; i++)
         mainArr[i].resize(N);
 
