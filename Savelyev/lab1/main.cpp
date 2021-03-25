@@ -100,6 +100,9 @@ void Start(int &k, vector<vector<int>>& sqr, vector<Square>& sqr_arr, int& S, in
     insert_sqr(sqr, 0, 0, (N + 1) / 2);
     insert_sqr(sqr, 0, (N + 1) / 2, N / 2);
     insert_sqr(sqr, (N + 1) / 2, 0, N / 2);
+    std::cout << "Поставил " << (N + 1) / 2 << " (" <<  1 << " " << 1 << ")" <<'\n';
+    std::cout << "Поставил " << N / 2 << " (" <<  1 << " " << (N + 1) / 2 + 1 << ")" <<'\n';
+    std::cout << "Поставил " << N / 2 << " (" <<  (N + 1) / 2 + 1 << " " << 1 << ")" <<'\n';
     // Вычисляем площадь после заполнения
     S = N * N - ((N + 1) / 2) * ((N + 1) / 2) - 2 * (N / 2) * (N / 2);
 
@@ -220,3 +223,5 @@ int main() {
     print_sqr(sqr, k, N);
     return 0;
 }
+
+
