@@ -1,2 +1,0 @@
-Ссылка на онлайн-компилятор:
-https://replit.com/@RyzhikhRoman/Lab1backtracking#main.cpp
