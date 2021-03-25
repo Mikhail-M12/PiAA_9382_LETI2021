@@ -15,7 +15,7 @@ void printAnswer(int scale = 1)
     }
 }
 
-void insertBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
+void insertBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Р’СЃС‚Р°РІРєР° РєРІР°РґСЂР°С‚Р° СЂР°Р·РјРµСЂРѕРј m * m СЃ Р»РµРІС‹Рј РІРµСЂС…РЅРёРј СѓРіР»РѕРІ РІ С‚РѕС‡РєРµ (x, y)
 {
     for (int i = 0; i < m; i++)
     {
@@ -26,7 +26,7 @@ void insertBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка к
     }
 }
 
-void removeBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка квадрата размером m * m с левым верхним углов в точке (x, y)
+void removeBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Р’СЃС‚Р°РІРєР° РєРІР°РґСЂР°С‚Р° СЂР°Р·РјРµСЂРѕРј m * m СЃ Р»РµРІС‹Рј РІРµСЂС…РЅРёРј СѓРіР»РѕРІ РІ С‚РѕС‡РєРµ (x, y)
 {
     for (int i = 0; i < m; i++)
     {
@@ -37,7 +37,7 @@ void removeBlock(vector<vector<bool>>& mainArr, int m, int x, int y) //Вставка к
     }
 }
 
-pair<int, int> findEmpty(vector<vector<bool>>& mainArr) //Поиск первой свободной ячейки для вставки
+pair<int, int> findEmpty(vector<vector<bool>>& mainArr) //РџРѕРёСЃРє РїРµСЂРІРѕР№ СЃРІРѕР±РѕРґРЅРѕР№ СЏС‡РµР№РєРё РґР»СЏ РІСЃС‚Р°РІРєРё
 {
     for (int i = N / 2; i < N; i++)
     {
@@ -83,13 +83,13 @@ void chooseBlock(vector<vector<bool>>& mainArr, vector<pair<int, pair<int, int>>
         return;
     }
     int tmpBestCounter = minCounter;
-    //поиск места для вставки блока
-    pair<int, bool> maxSize = findMaxSize(mainArr, coord.first, coord.second); //поиск максимального размера блока для вставки на найденное пустое место
-    if (maxSize.second)                                                        //Если можно вставить сразу блок максимального размера
+    //РїРѕРёСЃРє РјРµСЃС‚Р° РґР»СЏ РІСЃС‚Р°РІРєРё Р±Р»РѕРєР°
+    pair<int, bool> maxSize = findMaxSize(mainArr, coord.first, coord.second); //РїРѕРёСЃРє РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р±Р»РѕРєР° РґР»СЏ РІСЃС‚Р°РІРєРё РЅР° РЅР°Р№РґРµРЅРЅРѕРµ РїСѓСЃС‚РѕРµ РјРµСЃС‚Рѕ
+    if (maxSize.second)                                                        //Р•СЃР»Рё РјРѕР¶РЅРѕ РІСЃС‚Р°РІРёС‚СЊ СЃСЂР°Р·Сѓ Р±Р»РѕРє РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР°
     {
         tmpArr.push_back(make_pair(maxSize.first, coord));
         insertBlock(mainArr, maxSize.first, coord.first, coord.second);
-        chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
+        chooseBlock(mainArr, tmpArr, counter + 1, x, y); //РІСЃС‚Р°РІР»СЏРµРј РѕС‡РµСЂРµРґРЅРѕР№ Р±Р»РѕРє
         removeBlock(mainArr, maxSize.first, coord.first, coord.second);
         tmpArr.pop_back();
     }
@@ -101,14 +101,14 @@ void chooseBlock(vector<vector<bool>>& mainArr, vector<pair<int, pair<int, int>>
                 continue;
             tmpArr.push_back(make_pair(i, coord));
             insertBlock(mainArr, i, coord.first, coord.second);
-            chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
+            chooseBlock(mainArr, tmpArr, counter + 1, x, y); //РІСЃС‚Р°РІР»СЏРµРј РѕС‡РµСЂРµРґРЅРѕР№ Р±Р»РѕРє
             removeBlock(mainArr, i, coord.first, coord.second);
             tmpArr.pop_back();
         }
     }
 }
 
-void primeNumber(vector<vector<bool>>& mainArr) //вставка начальных блоков и начало работы бэктрекинга
+void primeNumber(vector<vector<bool>>& mainArr) //РІСЃС‚Р°РІРєР° РЅР°С‡Р°Р»СЊРЅС‹С… Р±Р»РѕРєРѕРІ Рё РЅР°С‡Р°Р»Рѕ СЂР°Р±РѕС‚С‹ Р±СЌРєС‚СЂРµРєРёРЅРіР°
 {
     insertBlock(mainArr, N / 2 + 1, 0, 0);
     insertBlock(mainArr, N / 2, N / 2 + 1, 0);
@@ -162,7 +162,7 @@ int main()
         division2();
         return 0;
     }
-    //создание "карты" столешницы
+    //СЃРѕР·РґР°РЅРёРµ "РєР°СЂС‚С‹" СЃС‚РѕР»РµС€РЅРёС†С‹
     vector<vector<bool>> mainArr(N);
     for (int i = 0; i < N; i++)
         mainArr[i].resize(N);
