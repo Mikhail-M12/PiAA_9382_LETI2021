@@ -1,0 +1,21 @@
+a e
+a b 3.0
+b c 1.0
+c d 1.0
+a d 5.0
+d e 1.0
+
+a z
+a w 2.0
+a b 1.0
+b y 1.0
+y z 1.0
+w z 3.0
+
+a z
+a x 5.0
+x y 1.0
+x z 1.0
+a b 4.0
+b z 2.0
+
