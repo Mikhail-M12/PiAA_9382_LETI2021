@@ -28,11 +28,16 @@ class Queue:
 
     def __sort(self):
         # Сортировка очереди
-        print("Сортировка очереди")
+        print("\nСортировка очереди")
         for i in range(len(self.__data) - 1):
             for j in range(len(self.__data) - i - 1):
                 if not self.__compare(self.__data[j], self.__data[j + 1]):
                     self.__data[j], self.__data[j + 1] = self.__data[j + 1], self.__data[j]
+        print("Очередь после сортировки")
+        for i in range(len(self.__data)):
+            print(self.__data[i])
+        print()
+
 
     def pop(self):
         # удаление верхнего элемента из очереди
@@ -97,7 +102,7 @@ class Graph:
                 for i in list(self.graph[temp[0]].keys()):
                     # Считаем текущее рассстояние
                     currentPathLength = shortPath[temp[0]][1] + self.graph[temp[0]][i]
-                    print("Текущий путь равен {}".format(currentPathLength))
+                    print("Текущий путь от вершины {}  до вершины {} равен {}".format(start, i, currentPathLength))
                     # Если текущее расстояние меньше
                     if i not in shortPath or shortPath[i][1] > currentPathLength:
                         # Изменяем данный
@@ -106,7 +111,6 @@ class Graph:
                             path.append(j)
                         path.append(i)
                         print("Текущий путь оказался короче")
-                        print("Текущий путь из вершин {}".format(path))
                         shortPath[i] = (path, currentPathLength)
                         # Подсчет эвристической функции
                         evristic = abs(ord(end) - ord(i))

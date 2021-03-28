@@ -36,24 +36,7 @@ class Graph:
         """
         print(self.graph)
 
-    def preparing(self, start, end):
-        """
-        Метод подготовк для жирного алгоритма
-        :param start: вершина с которой начинается алгоритм
-        :param end: вершина на которой закончится алгоритм
-        :return: массив вершин
-        """
-        done = []
-        check = False
-        ans = []
-
-        while not check:  # Будет выполняться до тех пор пока не получит необходимый ответ
-            ans, done = self.greedy(start, end, done)  # Вызывается жирный алгоритм
-            if ans[-1] == end:
-                check = True
-        return ans
-
-    def greedy(self, start, end, done):
+    def greedy(self, start, end):
         """
         Метод класса, отвечающий за жирный алгоритм
         :param start: вершина с которой начинается алгоритм
@@ -61,37 +44,41 @@ class Graph:
         :param done: массив вершин
         :return:
         """
-        key = start
-        ans = []
-        while key in self.graph and any(self.graph[key]):
+        check = False
+        done = []
+        while not check:
+            key = start
+            ans = []
+            while key in self.graph and any(self.graph[key]):
 
-            ans.append(key)
-            print("Текущая вершина: {}".format(key))
-            min = 999999999999
-            next = None
-            print("Проходимся по всем вершинам от вершины: {}".format(key))
-            for i in self.graph[key]:
-                print("Рассматриваем вершину: {} с расстоянием: {} от вершины {}".format(i, self.graph[key][i], key))
-                # если длина меньше чем минимальное значение и ключ не находится в пройденных вершинах
-                if min > self.graph[key][i] and i not in done:
-                    # если ключ в графе следующее значение ключа
-                    if i in self.graph:
-                        print("Расстояние меньше\nПереходим на вершину {}".format(i))
-                        next = i # задаём следующее значение ключа
-                        min = self.graph[key][i] # задаём минимальное расстояние
-                    # если ключ равен конечной вершине
-                    elif i == end:
-                        next = i # задаём следующее значение ключа
-                        min = self.graph[key][i] # задаём минимальное расстояние
-            key = next # задаём следующее значение ключа
-            print("Список пройденных вершин равен: {}".format(done))
-            done.append(key) # добавляем вершину в список пройденных
-            print("Добавляем вершину {} в список пройденных".format(key))
-            print()
-            if key == end:
                 ans.append(key)
-                return ans, done
-        return ans, done # возвращаем ответ
+                print("Текущая вершина: {}".format(key))
+                min = 999999999999
+                next = None
+                print("Проходимся по всем вершинам от вершины: {}".format(key))
+                for i in self.graph[key]:
+                    print("Рассматриваем вершину: {} с расстоянием: {} от вершины {}".format(i, self.graph[key][i], key))
+                    # если длина меньше чем минимальное значение и ключ не находится в пройденных вершинах
+                    if min > self.graph[key][i] and i not in done:
+                        # если ключ в графе следующее значение ключа
+                        if i in self.graph:
+                            print("Расстояние меньше\nПереходим на вершину {}".format(i))
+                            next = i # задаём следующее значение ключа
+                            min = self.graph[key][i] # задаём минимальное расстояние
+                        # если ключ равен конечной вершине
+                        elif i == end:
+                            next = i # задаём следующее значение ключа
+                            min = self.graph[key][i] # задаём минимальное расстояние
+                key = next # задаём следующее значение ключа
+                print("Список пройденных вершин равен: {}".format(done))
+                done.append(key) # добавляем вершину в список пройденных
+                if key is not None:
+                    print("Добавляем вершину {} в список пройденных".format(key))
+                print()
+                if key == end:
+                    ans.append(key)
+            if ans[-1] == end:
+                return ans # возвращаем ответ
 
     def get_graph(self):
         return self.graph
@@ -129,7 +116,7 @@ if __name__ == '__main__':
         if i > 0:
             tree.add_adge(a_lst[i][0], a_lst[i][1], float(a_lst[i][2]))
     print("\nПостроение графа завершено, переходим к жадному алгоритму\n")
-    ans = tree.preparing(a_lst[0][0], a_lst[0][1])
+    ans = tree.greedy(a_lst[0][0], a_lst[0][1])
     # Вывод ответа
 
     # отрисовка графа
