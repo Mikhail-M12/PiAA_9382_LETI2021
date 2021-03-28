@@ -8,10 +8,10 @@
 
 class FordFulkerson {
 public:
-    FordFulkerson();
     bool bfs();
     void doFulkerson();
     std::vector<std::pair<char, int>> getAdjacentVertices(char u);
+    void readGraph();
 
 private:
     char s;
@@ -162,7 +162,7 @@ void FordFulkerson::doFulkerson() {
     }
 }
 
-FordFulkerson::FordFulkerson() {
+void FordFulkerson::readGraph() {
     int N;
     std::cin >> N;
     std::cin >> s >> t;
@@ -176,6 +176,8 @@ FordFulkerson::FordFulkerson() {
 
 int main() {
     FordFulkerson ford;
+    ford.readGraph();
     ford.doFulkerson();
     return 0;
 }
+
