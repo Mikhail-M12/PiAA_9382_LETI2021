@@ -53,8 +53,7 @@ public:
     {
         prepareDivSetup();
 #ifdef DEBUG
-        std::cout << "=== Завершение первоначальной расстановки ===" << std::endl
-             << "++++++++ Поиск оптимального варианта ++++++++" << std::endl;
+        std::cout << "=== Завершение первоначальной расстановки ===" << std::endl;
 #endif
         updateOptimalDivision(size / 2, size / 2 + 1);
         saveOptimalDivString();
@@ -72,7 +71,7 @@ private:
         }
         currDivCount++;
 #ifdef DEBUG
-        std::cout << "~~~~~~~~~~ Добавление квадрата № " << currDivCount << " ~~~~~~~~~~" << std::endl;
+        std::cout << "~~~~~ Добавление квадрата № " << currDivCount << " (" << y + 1 << ", " << x + 1 << ", " << size_ << ") ~~~~~" << std::endl;
         if (compression > 1)
             std::cout << "Применен масштаб: " << compression << std::endl;
         for (auto & i : squareDivArr) {
@@ -119,7 +118,7 @@ private:
     {
 #ifdef DEBUG
         if (!optimal)
-            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << "Удаляем квадрат (" << x << ", " << y << ", " << size_ << ")" << std::endl;
+            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << "Удаляем квадрат (" << y + 1 << ", " << x + 1 << ", " << size_ << ")" << std::endl;
 #endif
         for (auto i = x; i < x + size_; ++i)
             for (auto j = y; j < y + size_; ++j) {
@@ -154,13 +153,12 @@ private:
     // Основной алгоритм квадрирования
     void updateOptimalDivision(size_t x, size_t y, int deep = 0)
     {
-        fragment f;
         if (currDivCount >= optimalDivCount)
             return;
         for (auto n = size / 2; n > 0; --n) {
             if (checkDivision(x, y, n)) {
                 insertDivision(x, y, n);
-                f = findEmpty(x, y);
+                fragment f = findEmpty(x, y);
                 if (f.isEmpty) {
                     updateOptimalDivision(f.x, f.y, deep++);
                 } else {
