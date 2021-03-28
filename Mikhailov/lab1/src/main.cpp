@@ -1,6 +1,7 @@
 /**
  * Подсчёт количества вариантов покрытия прямоугольника
- * минимальным числом квадратов с использованием итеративного бэктрекинга.
+ * минимальным числом квадратов
+ * с использованием рекурсивного бэктрекинга.
  * Рёбра квадратов меньше рёбер поля.
  */
 
@@ -9,20 +10,25 @@
 
 #define DEBUG
 
-using namespace std;
+struct fragment
+{
+    size_t x;
+    size_t y;
+    bool isEmpty;
+};
 
 class SquareDivision
 {
 private:
-    vector<vector<size_t>> squareDivArr;
-    vector<vector<size_t>> optimalSquareDivArr;
+    std::vector<std::vector<size_t>> squareDivArr;
+    std::vector<std::vector<size_t>> optimalSquareDivArr;
     size_t size{};
     size_t currDivCount{};
     size_t optimalDivCount{};
     size_t compression{};
 
 public:
-    vector<vector<size_t>> finalData;
+    std::vector<std::vector<size_t>> finalData;
     size_t totalDivisions = 0;
 
     explicit SquareDivision(size_t size_) : size(size_), optimalDivCount(size * size)
@@ -47,16 +53,14 @@ public:
     {
         prepareDivSetup();
 #ifdef DEBUG
-        cout << "=== Завершение первоначальной расстановки ===" << endl
-             << "++++++++ Поиск оптимального варианта ++++++++" << endl;
+        std::cout << "=== Завершение первоначальной расстановки ===" << std::endl
+             << "++++++++ Поиск оптимального варианта ++++++++" << std::endl;
 #endif
         updateOptimalDivision(size / 2, size / 2 + 1);
         saveOptimalDivString();
     }
 
 private:
-
-    /* Процедуры квадрирования */
 
     // Добавление нового квадрата
     void insertDivision(size_t x, size_t y, size_t size_)
@@ -68,14 +72,14 @@ private:
         }
         currDivCount++;
 #ifdef DEBUG
-        cout << "~~~~~~~~~~ Добавление квадрата № " << currDivCount << " ~~~~~~~~~~" << endl;
+        std::cout << "~~~~~~~~~~ Добавление квадрата № " << currDivCount << " ~~~~~~~~~~" << std::endl;
         if (compression > 1)
-            cout << "Применен масштаб: " << compression << endl;
+            std::cout << "Применен масштаб: " << compression << std::endl;
         for (auto & i : squareDivArr) {
             for (auto j : i) {
-                cout << j << "  ";
+                std::cout << j << "  ";
             }
-            cout << endl;
+            std::cout << std::endl;
         }
 #endif
     }
@@ -94,11 +98,11 @@ private:
     }
 
     // Поиск свободного фрагмента поля
-    bool findEmpty(size_t &x, size_t &y) {
+    fragment findEmpty(size_t x, size_t y) {
         while (squareDivArr[x][y] != 0) {
             if (y == size - 1) {
                 if (x == size - 1) {
-                    return false;
+                    return {x, y, false};
                 } else {
                     x++;
                     y = size / 2;
@@ -107,7 +111,7 @@ private:
             }
             y++;
         }
-        return true;
+        return {x, y, true};
     }
 
     // Удаление разбиения
@@ -115,7 +119,7 @@ private:
     {
 #ifdef DEBUG
         if (!optimal)
-            cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl << "Удаляем квадрат (" << x << ", " << y << ", " << size_ << ")" << endl;
+            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << "Удаляем квадрат (" << x << ", " << y << ", " << size_ << ")" << std::endl;
 #endif
         for (auto i = x; i < x + size_; ++i)
             for (auto j = y; j < y + size_; ++j) {
@@ -150,15 +154,15 @@ private:
     // Основной алгоритм квадрирования
     void updateOptimalDivision(size_t x, size_t y, int deep = 0)
     {
+        fragment f;
         if (currDivCount >= optimalDivCount)
             return;
         for (auto n = size / 2; n > 0; --n) {
             if (checkDivision(x, y, n)) {
                 insertDivision(x, y, n);
-                size_t copyX = x;
-                size_t copyY = y;
-                if (findEmpty(copyX, copyY)) {
-                    updateOptimalDivision(copyX, copyY, deep++);
+                f = findEmpty(x, y);
+                if (f.isEmpty) {
+                    updateOptimalDivision(f.x, f.y, deep++);
                 } else {
                     if (currDivCount < optimalDivCount) {
                         optimalSquareDivArr = squareDivArr;
@@ -204,7 +208,7 @@ public:
         size_t sqX = 1, sqY = 1; // координаты текущего квадрата
         size_t nWidth = width, nHeight = height; // размеры неразбитой области
         size_t totalDivisions = 0;
-        vector<vector<size_t>> finalData;
+        std::vector<std::vector<size_t>> finalData;
 
         // Квадрирование основной части прямоугольника - квадрата с максимально возможной стороной, который можно вписать в прямоугольник
         size_t size = nWidth < nHeight ? nWidth : nHeight;
@@ -244,8 +248,8 @@ public:
         delete cutter;
 
 #ifdef DEBUG
-        cout << "~~~~~ Оптимальное покрытие прямоугольника ~~~~~" << endl;
-        vector<vector<size_t>> rectArr;
+        std::cout << "~~~~~ Оптимальное покрытие прямоугольника ~~~~~" << std::endl;
+        std::vector<std::vector<size_t>> rectArr;
         rectArr.resize(height);
         for (auto &a : rectArr) {
             a.resize(width);
@@ -259,16 +263,16 @@ public:
         }
         for (auto & i : rectArr) {
             for (auto j : i) {
-                cout << j << "  ";
+                std::cout << j << "  ";
             }
-            cout << endl;
+            std::cout << std::endl;
         }
 #endif
 
-        cout << "Количество вариантов оптимального покрытия квадратами: " << endl << totalDivisions << endl;
-        cout << "Финальный результат:" << endl;
+        std::cout << "Количество вариантов оптимального покрытия квадратами: " << std::endl << totalDivisions << std::endl;
+        std::cout << "Финальный результат:" << std::endl;
         for (auto &data: finalData) {
-            cout << data[0] << " " << data[1] << " " << data[2] << endl;
+            std::cout << data[0] << " " << data[1] << " " << data[2] << std::endl;
         }
     };
 
@@ -277,13 +281,13 @@ public:
 int main()
 {
     size_t width, height;
-    cout << "Введите размеры прямоугольника" << endl;
-    cout << "Ширина: ";
-    cin >> width;
-    cout << "Высота: ";
-    cin >> height;
+    std::cout << "Введите размеры прямоугольника" << std::endl;
+    std::cout << "Ширина: ";
+    std::cin >> width;
+    std::cout << "Высота: ";
+    std::cin >> height;
     if (height < 2 || width < 2) {
-        cout << "Размер ребра прямоугольника не может быть меньше 2 по условиям задачи" << endl;
+        std::cout << "Размер ребра прямоугольника не может быть меньше 2 по условиям задачи" << std::endl;
         return 0;
     }
 
