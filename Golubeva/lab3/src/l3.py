@@ -2,11 +2,11 @@ class Graph:
 
     def __init__(self, graph):
         self.graph = graph
-        self.row = len(graph) #count of different vertice
+        self.row = len(graph)# count defferent vertice
 
     def searchBFS(self, source, outlet, parent):
 
-        visited = [False] * self.row #list
+        visited = [False] * self.row  #list
         queue = [source]
 
         visited[source] = True
@@ -25,10 +25,10 @@ class Graph:
           
     def findFlowSize(self, source, outlet, graph, parent):
 
-        flow_size = -1
+        flow_size = 10000
         vertex = outlet
         while vertex != source:
-            if self.graph[parent[vertex]][vertex] < flow_size and self.graph[parent[vertex]][vertex] > 0:
+            if self.graph[parent[vertex]][vertex] < flow_size:
                 flow_size = self.graph[parent[vertex]][vertex]
             vertex = parent[vertex]
 
@@ -36,7 +36,7 @@ class Graph:
 
     def algoFordFulkerson(self, source, outlet, flow_graph):
 
-        parent = [-1] * self.row
+        parent = [-1] * self.row 
         max_flow = 0
 
         while self.searchBFS(source, outlet, parent):
@@ -71,29 +71,30 @@ count = int(input())
 source = input()
 outlet = input()
 input_list = []
-dict_ver = {} #dict for convert vertex in index in matrix
+dict_ver = {} # correlate index in matrix and vertice name
 list_of_vertice = []
-size = 0 #matrix row and column size
+size = 0
 
 for i in range(count): # compute a count of defferent vertex
     input_list.append(input())
     b = input_list[i].split(" ")
-    for i in range(2):
-    	vert = b[i]
-    	if b[i] not in list_of_vertice:
-    	    list_of_vertice.append(vert)
-            size += 1  
+    for j in range(2):
+        vert = b[j]
+        if b[j] not in list_of_vertice:
+            list_of_vertice.append(b[j])
+            size += 1
 
 list_of_vertice.sort()
 for i in range(size):
-   dict_ver[list_of_vertice[i]] = i
+    dict_ver[list_of_vertice[i]] = i
 
-graph, flow = [[0 for x in range(size)] for y in range(size)] #incoming and outcoming adjecency graph
+graph = [[0 for x in range(size)] for y in range(size)] #incoming adjecency graph
+flow_graph = [[0 for x in range(size)] for y in range(size)] # outcoming adjecency graph
 
 for i in range(count):
     b = input_list[i].split(" ")
-    graph[dict_ver[b[0]]][dict_ver[b[1]]] = int(b[2]) #make an adjececy matrix
-   
+    graph[dict_ver[b[0]]][dict_ver[b[1]]] = int(b[2])
+    
 res_graph = Graph(graph)
 
 flow = res_graph.algoFordFulkerson(dict_ver[source], dict_ver[outlet], flow_graph)
