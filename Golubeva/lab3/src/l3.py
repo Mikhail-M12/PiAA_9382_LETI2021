@@ -2,11 +2,11 @@ class Graph:
 
     def __init__(self, graph):
         self.graph = graph
-        self.row = len(graph)
+        self.row = len(graph) #count of different vertice
 
     def searchBFS(self, source, outlet, parent):
 
-        visited = self.row * [False] #list
+        visited = [False] * self.row #list
         queue = [source]
 
         visited[source] = True
@@ -25,10 +25,10 @@ class Graph:
           
     def findFlowSize(self, source, outlet, graph, parent):
 
-        flow_size = 10000
+        flow_size = -1
         vertex = outlet
         while vertex != source:
-            if self.graph[parent[vertex]][vertex] < flow_size:
+            if self.graph[parent[vertex]][vertex] < flow_size and self.graph[parent[vertex]][vertex] > 0:
                 flow_size = self.graph[parent[vertex]][vertex]
             vertex = parent[vertex]
 
@@ -36,7 +36,7 @@ class Graph:
 
     def algoFordFulkerson(self, source, outlet, flow_graph):
 
-        parent = self.row * [-1]
+        parent = [-1] * self.row
         max_flow = 0
 
         while self.searchBFS(source, outlet, parent):
@@ -71,30 +71,28 @@ count = int(input())
 source = input()
 outlet = input()
 input_list = []
-dict_ver = {}
+dict_ver = {} #dict for convert vertex in index in matrix
 list_of_vertice = []
-size = 0
+size = 0 #matrix row and column size
 
 for i in range(count): # compute a count of defferent vertex
     input_list.append(input())
     b = input_list[i].split(" ")
-    if b[0] not in list_of_vertice:
-        list_of_vertice.append(b[0])
-        size +=1
-    if b[1] not in list_of_vertice:
-        list_of_vertice.append(b[1])
-        size += 1  
+    for i in range(2):
+    	vert = b[i]
+    	if b[i] not in list_of_vertice:
+    	    list_of_vertice.append(vert)
+            size += 1  
 
 list_of_vertice.sort()
 for i in range(size):
    dict_ver[list_of_vertice[i]] = i
 
-graph = [[0 for x in range(size)] for y in range(size)] #incoming adjecency graph
-flow_graph = [[0 for x in range(size)] for y in range(size)] # outcoming adjecency graph
+graph, flow = [[0 for x in range(size)] for y in range(size)] #incoming and outcoming adjecency graph
 
 for i in range(count):
     b = input_list[i].split(" ")
-    graph[dict_ver[b[0]]][dict_ver[b[1]]] = int(b[2])
+    graph[dict_ver[b[0]]][dict_ver[b[1]]] = int(b[2]) #make an adjececy matrix
    
 res_graph = Graph(graph)
 
@@ -109,7 +107,7 @@ for ind, value in enumerate(input_list):
     a = int(flow_graph[dict_ver[v[0]]][dict_ver[v[1]]])
     if a < 0:
         a = 0    
-    new_str = "{} {} {}".format(value[0], value[2], a)
+    new_str = f"{value[0]} {value[2]} {a}"
     input_list[ind] = new_str
     
 input_list.sort()
