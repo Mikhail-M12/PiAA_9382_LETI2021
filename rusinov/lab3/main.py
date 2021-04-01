@@ -110,6 +110,8 @@ class Solver:
         print()
 
         while answer:
+            print(f"На шаге {self._stepCounter} удалось пропустить поток размера {answer},"
+                  f" поэтому переходим к следующему шагу")
             self._stepCounter += 1
             # запускаем следующий шаг для поиска пути, обнуляем посещенные вершины
             result += answer
