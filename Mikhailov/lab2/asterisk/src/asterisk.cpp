@@ -16,7 +16,6 @@ class Asterisk
     char begin{}, end{}; // начальная и конечная вершина
     size_t nParallel{}; // количество вершин, снимаемых одновременно
     std::map<char, std::vector<std::pair<char, double >>> graph; // граф
-    std::map<char, bool> viewedVertexes; // список просмотренных вершин
     std::map<char, std::pair<char, double>> shortestPaths; // кратчайшие пути до вершин
 
     // структура для хранения вершины графа
@@ -56,18 +55,24 @@ public:
     {
         std::vector <Vertex> parallelVertexes; // массив вершин, снятых за один шаг
         std::priority_queue <Vertex, std::vector<Vertex>, Cmp> checkList; // список вершин, которые нужно рассмотреть, в начале очереди находятся вершины с самым низким приоритетом
-
+#ifdef DEBUG
+        bool isPrintPath = true;
+#endif
+        // в очередь с приоритетом помещается название начальной вершины
+        // и значение ее приоритета (сумма реального пути и предполагаемого)
         checkList.push(Vertex{begin, 0 + double(end - begin)});
         while (!checkList.empty() && checkList.top().name != end) { // цикл закончится, как только опустеет очередь или будет достигнута конечная вершина
 #ifdef DEBUG
-            for (auto &it : shortestPaths) {
-                std::cout << "mW[" << it.first << "]: ";
-                printPath(it.first);
-                std::cout << ' ';
+            if (isPrintPath) {
+                for (auto &it : shortestPaths) {
+                    printPath(it.first);
+                    std::cout << ' ';
+                }
+                std::cout << std::endl << "=========================" << std::endl;
+                isPrintPath = false;
             }
-            std::cout << std::endl;
 #endif
-            // вершины извлекаются пока мы не пройдем их все или очередь не опустеет
+            // вершины извлекаются, пока мы не пройдем их заданное количество или очередь не опустеет
             for (int i = 0; i < nParallel && !checkList.empty(); i++) {
                 Vertex v = checkList.top();
                 if (v.name == end)
@@ -75,18 +80,29 @@ public:
                 parallelVertexes.push_back(v);
                 checkList.pop();
             }
-            for (auto curVertex : parallelVertexes) { // рассмотрение всех извлеченных вершин
-                viewedVertexes[curVertex.name] = true;
+            for (auto curVertex : parallelVertexes) { // рассмотрение всех извлеченных из очереди вершин
                 for (int j = 0; j < graph[curVertex.name].size(); j++) { // все смежные вершины
                     std::pair<char, double> newVertex = graph[curVertex.name][j];
-                    if (viewedVertexes[newVertex.first]) // если вершина уже была рассмотрена, то она пропускается
-                        continue;
+#ifdef DEBUG
+                    std::cout << "Рассматриваем вершину: " << newVertex.first << ". ";
+#endif
+                    // если вершина еще не была рассмотрена или новый найденный путь короче,
+                    // то запоминается новый кратчайший путь до этой вершины и она добавляется в очередь
                     if (shortestPaths[newVertex.first].second == 0 || shortestPaths[newVertex.first].second > shortestPaths[curVertex.name].second + newVertex.second) {
-                        // если вершина еще не была рассмотрена или новый найденный путь короче,
-                        // то эта врешина добавляется в очередь и запоминается новый кратчайший путь до нее
+#ifdef DEBUG
+                        if (shortestPaths[newVertex.first].second > 0)
+                            std::cout << "Предыдущий вычисленный путь: " << shortestPaths[newVertex.first].second << ". ";
+#endif
                         shortestPaths[newVertex.first].second = shortestPaths[curVertex.name].second + newVertex.second;
                         shortestPaths[newVertex.first].first = curVertex.name;
                         checkList.push(Vertex{newVertex.first, shortestPaths[newVertex.first].second + double(end - newVertex.first)}); // добавление в список для рассмотрения
+#ifdef DEBUG
+                        std::cout << "Новый вычисленный кратчайший путь, проходящий через вершину "
+                                  << shortestPaths[newVertex.first].first << ": " << shortestPaths[newVertex.first].second << ". ";
+                        std::cout << "Вершина " << newVertex.first << " добавлена в очередь, значение приоритета: "
+                                  << shortestPaths[newVertex.first].second + double(end - newVertex.first) << std::endl;
+                        isPrintPath = true;
+#endif
                     }
                 }
             }
