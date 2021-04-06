@@ -1,0 +1,4 @@
+Ссылка на онлайн-компилятор
+Необходимо сменить макрос task на определенную задачу (1 или 2)
+
+https://replit.com/@lastrise/AggressiveLuxuriousAddin#main.cpp
