@@ -1,0 +1,2 @@
+Онлайн-компилятор, где можно запустить код:
+https://replit.com/@oorschnai/1#main.cpp
