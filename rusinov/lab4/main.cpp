@@ -2,7 +2,7 @@
 #include "vector"
 #include "iostream"
 
-#define task 2
+#define task 1
 
 
 std::string getArrowString(int stringLength, int index) {
@@ -94,22 +94,21 @@ std::vector<int> getSubstringIndexes(std::string & text, std::string & pattern) 
 
             auto info = "";
 
-            if (substringIndex + 1 == pattern.length()) {
+            textIndex += 1;
+            substringIndex += 1;
+
+            if (substringIndex == pattern.length()) {
                 // если индекс конечный для подстроки, то мы нашли заданную подстроку в тексте
                 // сдвигаемся назад в подстроке
 
                 info = "Символы равны, в подстроке не осталось символов для сравнения, поэтому найдено вхождение подстроки в текст";
-                print(text, pattern, textIndex, substringIndex, info);
-
+                print(text, pattern, textIndex - 1, substringIndex - 1, info);
                 result.push_back(textIndex - substringIndex);
-                substringIndex = prefixFunction[substringIndex];
+                substringIndex = prefixFunction[substringIndex - 1];
             } else {
                 info = "Символы равны, и в подстроке еще есть символы для сравнения, рассматриваем следующие символы";
-                print(text, pattern, textIndex, substringIndex, info);
+                print(text, pattern, textIndex - 1, substringIndex - 1, info);
             }
-
-            textIndex += 1;
-            substringIndex += 1;
 
         } else { // Если символы не равны
             // если символ подстроки первый, то сдвигаем индекс текста
