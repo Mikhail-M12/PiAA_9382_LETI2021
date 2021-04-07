@@ -5,10 +5,10 @@
 #define task 1
 
 
-std::string getArrowString(int stringLength, int index) {
+std::string getArrowString(int stringLength, int indexOfArrow) {
     auto string = std::string();
     for (int i = 0; i < stringLength; ++i) {
-        if (i == index) string += "\u2193";
+        if (i == indexOfArrow) string += "\u2193";
         else string += " ";
     }
     return string;
