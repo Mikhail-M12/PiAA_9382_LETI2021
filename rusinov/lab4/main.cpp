@@ -138,7 +138,9 @@ void firstTask(std::string & text, std::string & pattern) {
     if (!result.empty()) {
         for (int i = 0; i < result.size() - 1; ++i) std::cout << result[i] << ',';
         std::cout << result[result.size() - 1];
-    } else std::cout << -1;
+    } else {
+        std::cout << -1;
+    }
 }
 
 
@@ -151,8 +153,11 @@ void secondTask(std::string & text, std::string & pattern) {
 
     text = text + text;
     auto result = getSubstringIndexes(text, pattern);
-    if (!result.empty()) std::cout << result[0];
-    else std::cout << -1;
+    if (!result.empty()) { 
+        std::cout << result[0]; 
+    } else {
+        std::cout << -1;
+    }
 }
 
 
