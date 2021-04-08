@@ -1,3 +1,59 @@
 enable Intermediate data? 1 - Yes 0 - No
+Gready Algoritm - 0, Astar - 1, Dijkstra - 2
+Input data with ')' on end: 
+Using A* algorithm
+______________________________________
+	Calculate the heuristic function for each neighbor
 
-Answer is: bge
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { b, 0} )
+	We took the vertices out of the queue{ b, 0} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'b'
+		__________________________b -> d__________________________
+			Calculate the heuristic function f = g + h = 7 + 1 = 8
+			Heuristic function for 'd' = 8 
+			Add in queue 'd'. ({ d, 7} )
+
+			Add prev vertex in parent b->
+		__________________________b -> e__________________________
+			Calculate the heuristic function f = g + h = 8 + 0 = 8
+			Heuristic function for 'e' = 8 
+			Add in queue 'e'. ({ e, 8}{ d, 7} )
+
+			Add prev vertex in parent b->
+		__________________________b -> g__________________________
+			Calculate the heuristic function f = g + h = 6 + -2 = 4
+			Heuristic function for 'g' = 4 
+			Add in queue 'g'. ({ g, 6}{ e, 8}{ d, 7} )
+
+			Add prev vertex in parent b->
+
+				b != e
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { g, 6}{ e, 8}{ d, 7} )
+	We took the vertices out of the queue{ g, 6} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'g'
+		__________________________g -> e__________________________
+			Calculate the heuristic function f = g + h = 7 + 0 = 7
+			The current  heuristic function is less than the previous one (e), write a new value
+			8 > 7 ; e = 7
+			Add prev vertex in parent g->b->
+
+				g != e
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { e, 7}{ d, 7} )
+	We took the vertices out of the queue{ e, 7} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'e'
+
+				e = e
+ 				End
+
+b->g->e
+Answer is :b->g->e

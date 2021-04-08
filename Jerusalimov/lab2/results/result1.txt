@@ -1,3 +1,8 @@
 enable Intermediate data? 1 - Yes 0 - No
+Gready Algoritm - 0, Astar - 1, Dijkstra - 2
+Using A* algorithm
+______________________________________
+	Calculate the heuristic function for each neighbor
 
-Answer is: ade
+a->d->e
+Answer is :a->d->e

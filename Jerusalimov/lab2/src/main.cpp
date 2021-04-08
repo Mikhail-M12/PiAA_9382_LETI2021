@@ -1,12 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <queue>
 
 
-
-int PRINT = 1;
+int PRINT = 0;
 
 using namespace std;
+
 
 struct Edge {
     char name;
@@ -15,31 +16,58 @@ struct Edge {
     Edge(char name, int mass) {
         this->name = name;
         this->mass = mass;
+
     }
+
+
 };
+
 
 struct Vertex {
     Vertex(char name) {
         this->name = name;
         used = false;
-        //edge = new Edge();
+        prev = nullptr;
+        sum = 0;
+        heuristic = 0;
     }
 
+    double sum;
+    double heuristic;
     char name;
     bool used;
+    Vertex *prev;
     vector<Edge *> edge;
 
 };
 
+struct CmpAstar {
+    bool operator()(Vertex *v1, Vertex *v2) {//for queue
+        if (v1->heuristic == v2->heuristic) {
+            return v2->name > v1->name;
+        }
+        return (v2->heuristic) < (v1->heuristic);
+    }
+
+    bool cmpAstar(Vertex *num1, double num2) {//for nums
+        return num1->heuristic > num2;
+    }
+};
+
+struct CmpDijkstra {
+    bool operator()(Vertex *v1, Vertex *v2) { //for queue
+        return (v2->sum) < (v1->sum);
+    }
+
+    bool cmpDijkstra(Vertex *num1, double num2) { //for nums
+        return num1->sum > num2;
+    }
+};
+
+
 class Graph {
 public:
-    Graph() {
 
-    }
-
-    ~Graph() {
-
-    }
 
     void AddVertex(char name) {
         if (FindVertex(name) == nullptr) {
@@ -201,167 +229,171 @@ public:
 
 };
 
-class Dijkstra {
+
+class Dijkstra_and_Astar {
 private:
-
-    class NodeInfo {
-    public:
-        char vertex;
-        char prev;
-        int sum;
-        bool used;
-
-        NodeInfo(char vertex) {
-            this->vertex = vertex;
-            used = false;
-            sum = INT32_MAX;
-            prev = vertex;
+    void RestorePath(const char start, char end) {
+        string path(1, end);
+        while (end != start) {
+            end = graph->FindVertex(end)->prev->name;
+            path = string(1, end) + "->" +path;
         }
-    };
+        cout << path << "\n";
+        cout<< "Answer is :"<<path<<"\n";
+    }
 
-    Graph *solve;
-    vector<NodeInfo *> info;
-    vector<char> result;
-
+    vector<char> answ;
+    Graph *graph;
 public:
-
-    Dijkstra(Graph *a) {
-        solve = a;
+    Dijkstra_and_Astar(Graph *a) {
+        this->graph = a;
     }
 
-    string getShortestPath(char vertex1, char vertex2) {
-        Init();
-        if (PRINT) {
-            cout << "\t\t\tDijkstra Algorithm Start!\nInitialization new struct data...\n";
-            cout << "The sum of the starting vertex \'" << vertex1 << "\' is equal to zero.\n"
-                 << GetNodeInfo(vertex1)->sum
-                 << " = 0\n";
+    template<typename T>
+    void printQueue(priority_queue<Vertex *, std::vector<Vertex *>, T> queue) {
+        while (!queue.empty()) {
+            cout << "{ " << queue.top()->name << ", " << queue.top()->sum << "}";
+            queue.pop();
         }
-
-
-        GetNodeInfo(vertex1)->sum = 0;
-        char curr;
-
-        if (PRINT) {
-            cout << "\tLooking for the minimum unused vertex\n";
-        }
-
-        while ((curr = FindUnusedMinimalNode()) != '\0') {
-            if (PRINT) {
-                cout << "\t_____________" << curr << "_________________\n\t\tSet the sum to the all next neighbors.\n";
-            }
-
-            SetSumToNextNodes(curr);
-            if (PRINT) {
-                cout << "\t______________________________\n\n";
-                cout << "\tLooking for the minimum unused vertex\n";
-            }
-
-        }
-        if (PRINT) {
-            cout
-                    << "\n\n||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n\tArranged paths, let's walk along them\n";
-        }
-
-        return RestorePath(vertex1, vertex2);
     }
 
-    string RestorePath(char vertex1, char vertex2) {
-        string path(1, vertex2);
-        if (PRINT) {
-            cout << "We write at the end the required vertex \'" << path << "\'\n";
+    template<typename T>
+    void AstarOrDijkstra(char start, char end) {
+        priority_queue<Vertex *, std::vector<Vertex *>, T> quequeAstar;
+
+        quequeAstar.push(graph->FindVertex(start));
+
+        Vertex *current;
+        Vertex *temp;
+        int newSum;
+        double tempHeuristic;
+        bool choiseAlgorithm = 1;
+        CmpDijkstra cmp;
+        CmpAstar cmpA;
+        if (typeid(T) == typeid(CmpDijkstra)) {
+            choiseAlgorithm = 0;
+
+                cout << "Using Dijkstra algorithm\n______________________________________\n";
+                cout << "\tCalculate the summ of path for each neighbor\n\n";
+
+        } else {
+
+                cout << "Using A* algorithm\n______________________________________\n";
+                cout << "\tCalculate the heuristic function for each neighbor\n\n";
+
         }
+        do {
 
-        while (vertex2 != vertex1) {
+            current = quequeAstar.top();
+
             if (PRINT) {
-                cout << "Previous vertex is \'" << GetNodeInfo(vertex2)->prev << "\' From: \'" << vertex2 << "\'\n";
-
-            }
-            vertex2 = GetNodeInfo(vertex2)->prev;
-
-            path = string(1, vertex2) + path;
-            if (PRINT) {
-                cout << "Writing in the start: " << path << "\n";
-            }
-
-        }
-        return path;
-    }
-
-    void SetSumToNextNodes(char curr) {
-        NodeInfo *currInfo = GetNodeInfo(curr);
-        currInfo->used = true;
-
-        for (int i = 0; i < solve->FindVertex(curr)->edge.size(); ++i) {
-            NodeInfo *prevInfo = GetNodeInfo(solve->FindVertex(curr)->edge[i]->name);
-            int newSum = currInfo->sum + solve->FindVertex(curr)->edge[i]->mass;
-            if (PRINT) {
-                cout << "\t\t\tFor vertex \'" << prevInfo->vertex << "\' set a new amount. Was - " << prevInfo->sum
-                     << " now - " << newSum << "\n";
-
+                cout << "//////////////////////////////////////////////////////////////\n";
+                cout << "\n\tCurrent queue ( ";
+                printQueue<T>(quequeAstar);
+                cout << " )\n";
+                cout << "\tWe took the vertices out of the queue" << "{ " << quequeAstar.top()->name << ", "
+                     << quequeAstar.top()->sum << "}" << " and put it in a temporary variable\n";
             }
 
+            quequeAstar.pop();
+            current->used = true;
 
-            if (newSum < prevInfo->sum) {
-                prevInfo->sum = newSum;
-                prevInfo->prev = curr;
+            if (PRINT) {
+                cout << "\tWe go through all the neighbors of the vertex  \'" << current->name << "\'\n";
+                if (current->edge.empty() && current->name != end) {
+                    cout << "Vertex \'" << current->name << "\' has no neighbors\nTake the next item in the queue\n\n";
+
+                }
+            }
+
+            for (auto &neighbour : current->edge) {
+
+                tempHeuristic = current->sum + neighbour->mass + (end - neighbour->name);
+                temp = graph->FindVertex(neighbour->name);
                 if (PRINT) {
-                    cout << "\t\t\tRetained a pointer to the previous vertex. \tCurrent vertex: " << prevInfo->vertex
-                         << " Previous vertex: " << prevInfo->prev << "\n";
+                    cout << "\t\t__________________________" << current->name << " -> " << neighbour->name
+                         << "__________________________\n";
+                    if (choiseAlgorithm) {
+                        cout << "\t\t\tCalculate the heuristic function f = g + h = " << current->sum + neighbour->mass
+                             << " + " << (end - neighbour->name) << " = " << tempHeuristic << "\n";
+                    } else {
+                        cout << "\t\t\tcalculate the sum for \'" << neighbour->name << "\', summ = current + next = "
+                             << current->sum << " + " << neighbour->mass << " = " << current->sum + neighbour->mass
+                             << "\n";
+                    }
 
                 }
 
-            }
+                if (choiseAlgorithm ? cmpA.cmpAstar(temp, tempHeuristic) : cmp.cmpDijkstra(temp, neighbour->mass)) {
+                    if (PRINT) {
+                        if (choiseAlgorithm) {
+                            cout << "\t\t\tThe current  heuristic function is less than the previous one ("
+                                 << temp->name << "), write a new value\n\t\t\t" << temp->heuristic << " > "
+                                 << tempHeuristic << " ; " << temp->name << " = " << tempHeuristic << "\n";
+                        } else {
+                            cout << "\t\t\tThe current summ is less than the previous one (" << temp->name
+                                 << "), write a new value\n\t\t\t" << temp->sum << " > "
+                                 << current->sum + neighbour->mass << " ; " << temp->name << " = "
+                                 << current->sum + neighbour->mass << "\n";
+                        }
+                    }
+                    temp->heuristic = tempHeuristic;
+                    temp->sum = current->sum + neighbour->mass;
+                    temp->prev = current;
+                    answ.push_back(temp->prev->name);
+                    if (PRINT) {
 
+                        cout << "\t\t\tAdd prev vertex in parent ";
+                        while (temp->prev != nullptr) {
+                            cout << temp->prev->name << "->";
+                            temp = temp->prev;
+                        }
+                        cout << "\n";
 
-        }
-        if (PRINT) {
-            cout << "\t\tAll neighboring vertices have been visited.\n";
+                    }
 
-        }
+                } else if (choiseAlgorithm ? temp->heuristic == 0 : temp->sum == 0) {
 
-    }
+                    temp->heuristic = tempHeuristic;
+                    temp->sum = current->sum + neighbour->mass;
+                    temp->prev = current;
+                    answ.push_back(current->name);
+                    quequeAstar.push(temp);
+                    answ.push_back(temp->prev->name);
+                    if (PRINT) {
+                        if (choiseAlgorithm) {
+                            cout << "\t\t\tHeuristic function for \'" << temp->name << "\' = " << temp->heuristic
+                                 << " \n";
+                        } else {
+                            cout << "\t\t\tThe sum of paths for \'" << temp->name << "\' = " << temp->sum << " \n";
+                        }
+                        cout << "\t\t\tAdd in queue \'" << temp->name << "\'. (";
+                        printQueue<T>(quequeAstar);
+                        cout << " )\n\n";
 
-    char FindUnusedMinimalNode() {
-        int minSum = INT32_MAX;
-        char minVertex = '\0';
-        for (int i = 0; i < solve->graph.size(); ++i) {
-            NodeInfo *tempInfo = GetNodeInfo(solve->graph[i].name);
-            if (tempInfo->used) continue;
-            if (tempInfo->sum < minSum) {
-                if (PRINT) {
-                    cout << "\t\tFound an unused minimum node vertex: " << tempInfo->vertex << "\n";
-                    cout << "\t\tPrevious minimum size is - " << minSum << ". New is - " << tempInfo->sum << "\n\n";
+                        cout << "\t\t\tAdd prev vertex in parent ";
+                        while (temp->prev != nullptr && temp->name != start) {
+                            cout << temp->prev->name << "->";
+                            temp = temp->prev;
+                        }
+                        cout << "\n";
+
+                    }
                 }
-                minSum = tempInfo->sum;
-                minVertex = solve->graph[i].name;
-
             }
-        }
-        if (PRINT) {
-            cout << "\n\tThe minimum unused vertex turned out to be : " << minVertex << ". Size - " << minSum << "\n";
-        }
-        return minVertex;
-    }
-
-    void Init() {
-        for (int i = 0; i < solve->graph.size(); ++i) {
-            info.push_back(new NodeInfo(solve->graph[i].name));
-        }
-    }
-
-    NodeInfo *GetNodeInfo(char vertex) {
-        for (int i = 0; i < info.size(); ++i) {
-            if (info[i]->vertex == vertex) {
-                return info[i];
+            if(PRINT){
+                if(current->name != end)
+                    cout<<"\n\t\t\t\t" << current->name << " != " << end << "\n \t\t\t\tContinue...\n\n";
+                else  cout<<"\n\t\t\t\t" << current->name << " = " << end << "\n \t\t\t\tEnd\n\n";
             }
-        }
-        cout << "Can't find Node info about vertex -  " << vertex;
-        exit(-1);
 
+
+        } while (current->name != end);
+
+
+        RestorePath(start, end);
+        return;
     }
-
-
 };
 
 
@@ -372,14 +404,14 @@ int main() {
     char mainVertex, secondVertex;
 
     int i = 0;
-    int choise;
+    int choise = 1;
     int b;
     cout << "enable Intermediate data? 1 - Yes 0 - No\n";
     cin >> b;
     PRINT = b;
-    if (PRINT) {
-        cout << "Gready Algoritm - 0, Dijkstra - 1\n";
-    }
+    //if (PRINT) {
+        cout << "Gready Algoritm - 0, Astar - 1, Dijkstra - 2\n";
+    //}
     cin >> choise;
     if (PRINT) {
         cout << "Input data with ')' on end: \n";
@@ -400,10 +432,14 @@ int main() {
         GreedyAlgorithm *some = new GreedyAlgorithm(&a);
 
         some->getShortestPath(start, end);
-    } else {
-        Dijkstra *some = new Dijkstra(&a);
+    } else if (choise == 1) {
+        Dijkstra_and_Astar *some = new Dijkstra_and_Astar(&a);
         //cout << "Shortest Path using Dijkstra algorithm:\n";
-        cout << "\nAnswer is: " + some->getShortestPath(start, end) + '\n';
+        // cout << some->getShortestPath(start, end);
+        some->AstarOrDijkstra<CmpAstar>(start, end);
+    } else {
+        Dijkstra_and_Astar *some = new Dijkstra_and_Astar(&a);
+        some->AstarOrDijkstra<CmpDijkstra>(start, end);
     }
 
     system("pause>nul");
