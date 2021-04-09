@@ -59,8 +59,8 @@ struct CmpDijkstra {
         return (v2->sum) < (v1->sum);
     }
 
-    bool cmpDijkstra(Vertex *num1, double num2) { //for nums
-        return num1->sum > num2;
+    bool cmpDijkstra(double num1, double num2) { //for nums
+        return num1 > num2;
     }
 };
 
@@ -236,14 +236,14 @@ private:
         string path(1, end);
         while (end != start) {
             end = graph->FindVertex(end)->prev->name;
-            path = string(1, end) + "->" +path;
+            path = string(1, end) + "->" + path;
         }
         cout << path << "\n";
-        cout<< "Answer is :"<<path<<"\n";
+        cout << "Answer is :" << path << "\n";
     }
 
-    vector<char> answ;
     Graph *graph;
+
 public:
     Dijkstra_and_Astar(Graph *a) {
         this->graph = a;
@@ -252,7 +252,10 @@ public:
     template<typename T>
     void printQueue(priority_queue<Vertex *, std::vector<Vertex *>, T> queue) {
         while (!queue.empty()) {
-            cout << "{ " << queue.top()->name << ", " << queue.top()->sum << "}";
+            if (typeid(T) != typeid(CmpDijkstra))
+                cout << "{ " << queue.top()->name << ", " << queue.top()->heuristic << "}";
+            else
+                cout << "{ " << queue.top()->name << ", " << queue.top()->sum << "}";
             queue.pop();
         }
     }
@@ -273,13 +276,13 @@ public:
         if (typeid(T) == typeid(CmpDijkstra)) {
             choiseAlgorithm = 0;
 
-                cout << "Using Dijkstra algorithm\n______________________________________\n";
-                cout << "\tCalculate the summ of path for each neighbor\n\n";
+            cout << "Using Dijkstra algorithm\n______________________________________\n";
+            cout << "\tCalculate the summ of path for each neighbor\n\n";
 
         } else {
 
-                cout << "Using A* algorithm\n______________________________________\n";
-                cout << "\tCalculate the heuristic function for each neighbor\n\n";
+            cout << "Using A* algorithm\n______________________________________\n";
+            cout << "\tCalculating the priority for each neighbor\n\n";
 
         }
         do {
@@ -291,8 +294,13 @@ public:
                 cout << "\n\tCurrent queue ( ";
                 printQueue<T>(quequeAstar);
                 cout << " )\n";
-                cout << "\tWe took the vertices out of the queue" << "{ " << quequeAstar.top()->name << ", "
-                     << quequeAstar.top()->sum << "}" << " and put it in a temporary variable\n";
+                cout << "\tWe took the vertices out of the queue" << "{ " << quequeAstar.top()->name << ", ";
+                if (!choiseAlgorithm)
+                    cout<<quequeAstar.top()->sum << "}" << " and put it in a temporary variable\n";
+                else
+                    cout<<quequeAstar.top()->heuristic << "}" << " and put it in a temporary variable\n";
+
+
             }
 
             quequeAstar.pop();
@@ -314,7 +322,7 @@ public:
                     cout << "\t\t__________________________" << current->name << " -> " << neighbour->name
                          << "__________________________\n";
                     if (choiseAlgorithm) {
-                        cout << "\t\t\tCalculate the heuristic function f = g + h = " << current->sum + neighbour->mass
+                        cout << "\t\t\tCalculating the priority f = g + h = " << current->sum + neighbour->mass
                              << " + " << (end - neighbour->name) << " = " << tempHeuristic << "\n";
                     } else {
                         cout << "\t\t\tcalculate the sum for \'" << neighbour->name << "\', summ = current + next = "
@@ -324,7 +332,7 @@ public:
 
                 }
 
-                if (choiseAlgorithm ? cmpA.cmpAstar(temp, tempHeuristic) : cmp.cmpDijkstra(temp, neighbour->mass)) {
+                if (choiseAlgorithm ? cmpA.cmpAstar(temp, tempHeuristic) : cmp.cmpDijkstra(temp->sum, neighbour->mass+current->sum)) {
                     if (PRINT) {
                         if (choiseAlgorithm) {
                             cout << "\t\t\tThe current  heuristic function is less than the previous one ("
@@ -332,7 +340,7 @@ public:
                                  << tempHeuristic << " ; " << temp->name << " = " << tempHeuristic << "\n";
                         } else {
                             cout << "\t\t\tThe current summ is less than the previous one (" << temp->name
-                                 << "), write a new value\n\t\t\t" << temp->sum << " > "
+                                 << "), write a new value\n\t\t\t" << temp->sum << " < "
                                  << current->sum + neighbour->mass << " ; " << temp->name << " = "
                                  << current->sum + neighbour->mass << "\n";
                         }
@@ -340,11 +348,10 @@ public:
                     temp->heuristic = tempHeuristic;
                     temp->sum = current->sum + neighbour->mass;
                     temp->prev = current;
-                    answ.push_back(temp->prev->name);
                     if (PRINT) {
 
                         cout << "\t\t\tAdd prev vertex in parent ";
-                        while (temp->prev != nullptr) {
+                        while (temp->prev != nullptr&& temp->name != start && temp->name != end) {
                             cout << temp->prev->name << "->";
                             temp = temp->prev;
                         }
@@ -357,34 +364,36 @@ public:
                     temp->heuristic = tempHeuristic;
                     temp->sum = current->sum + neighbour->mass;
                     temp->prev = current;
-                    answ.push_back(current->name);
                     quequeAstar.push(temp);
-                    answ.push_back(temp->prev->name);
                     if (PRINT) {
                         if (choiseAlgorithm) {
-                            cout << "\t\t\tHeuristic function for \'" << temp->name << "\' = " << temp->heuristic
+                            cout << "\t\t\tnew priority for \'" << temp->name << "\' = " << temp->heuristic
                                  << " \n";
                         } else {
-                            cout << "\t\t\tThe sum of paths for \'" << temp->name << "\' = " << temp->sum << " \n";
+                            cout << "\t\t\tThe new sum of paths for \'" << temp->name << "\' = " << temp->sum << " \n";
                         }
                         cout << "\t\t\tAdd in queue \'" << temp->name << "\'. (";
                         printQueue<T>(quequeAstar);
                         cout << " )\n\n";
 
                         cout << "\t\t\tAdd prev vertex in parent ";
-                        while (temp->prev != nullptr && temp->name != start) {
-                            cout << temp->prev->name << "->";
+                        while (temp->prev != nullptr && temp->name != start && temp->name != end) {
+                            cout << temp->prev->name << "<-";
                             temp = temp->prev;
                         }
                         cout << "\n";
 
                     }
+                }else{
+                    if (PRINT) {
+                        cout<<"\t\t\tSum of top \'"<<temp->name<<"\' is better than new. "<<temp->sum<<" < "<<current->sum + neighbour->mass <<", go next.\n";
+                    }
                 }
             }
-            if(PRINT){
-                if(current->name != end)
-                    cout<<"\n\t\t\t\t" << current->name << " != " << end << "\n \t\t\t\tContinue...\n\n";
-                else  cout<<"\n\t\t\t\t" << current->name << " = " << end << "\n \t\t\t\tEnd\n\n";
+            if (PRINT) {
+                if (current->name != end)
+                    cout << "\n\t\t\t\t" << current->name << " != " << end << "\n \t\t\t\tContinue...\n\n";
+                else cout << "\n\t\t\t\t" << current->name << " = " << end << "\n \t\t\t\tEnd\n\n";
             }
 
 
@@ -410,7 +419,7 @@ int main() {
     cin >> b;
     PRINT = b;
     //if (PRINT) {
-        cout << "Gready Algoritm - 0, Astar - 1, Dijkstra - 2\n";
+    cout << "Gready Algoritm - 0, Astar - 1, Dijkstra - 2\n";
     //}
     cin >> choise;
     if (PRINT) {
@@ -445,3 +454,14 @@ int main() {
     system("pause>nul");
     return 0;
 }
+//a g
+//a b 3.0
+//a c 1.0
+//b d 2.0
+//b e 1.0
+//d e 4.0
+//e a 1.0
+//e f 1.0
+//a g 8.0
+//f g 1.0
+//)
