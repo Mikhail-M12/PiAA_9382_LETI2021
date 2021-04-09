@@ -1,10 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <fstream>
 #include <map>
-
-using namespace std;
 
 
 struct Edge {
@@ -13,19 +10,19 @@ struct Edge {
 	double lenght; // длинна ребра
 };
 
-bool Sort(const pair<char, double >& a, const pair<char, double >& b) {
-	return (a.second < b.second);
+bool Sort(const std::pair<char, double >& a, const std::pair<char, double >& b) {
+	return a.second < b.second;
 }
 
 // сортирует смежные вершины по длине ребра, от меньшего к большему
-void sort_lenght(map<char, vector<pair<char, double >>>& nodes) {
-    for(auto& item : nodes) {
+void sort_lenght(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
+    for(const auto& item : nodes) {
 		sort(nodes[item.first].begin(), nodes[item.first].end(), Sort);
 	}
 }
 
 // формирует список смежности вершин
-void make_list(map<char, vector<pair<char, double >>>& nodes, vector<Edge>& edge_mass) {
+void make_list(std::map<char, std::vector<std::pair<char, double >>>& nodes, std::vector<Edge>& edge_mass) {
 	char top1;
 	char top2;
 	double lenght;
@@ -34,12 +31,12 @@ void make_list(map<char, vector<pair<char, double >>>& nodes, vector<Edge>& edge
 		top1 = edge_mass[i].top1;
 		top2 = edge_mass[i].top2;
 		lenght = edge_mass[i].lenght;
-		nodes[top1].push_back(make_pair(top2, lenght));
+		nodes[top1].push_back(std::make_pair(top2, lenght));
 	}
 }
 
 // рекурсивная функция поиска пути
-void find_way(map<char, vector<pair<char, double >>>& nodes, vector<char>& way, char top1, char top2, bool& flag) {
+void find_way(std::map<char, std::vector<std::pair<char, double >>>& nodes, std::vector<char>& way, char top1, char top2, bool& flag) {
 	// добавляем вершину в путь
 	std::cout << "Добавили вершину: " << top1 << "\n\n";
 	way.push_back(top1);
@@ -64,19 +61,19 @@ void find_way(map<char, vector<pair<char, double >>>& nodes, vector<char>& way, 
 }
 
 // считывает ввод пользователя
-void user_input(map<char, vector<pair<char, double >>>& nodes) {
-	vector<Edge> edge_mass;
+void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
+	std::vector<Edge> edge_mass;
 	Edge elem;
 	char top1;
 	char top2;
 	top1 = ' ';
 	double lenght;
-	while (cin >> top1) {
+	while (std::cin >> top1) {
 		if (!top1 || top1 == '/') {
 			break;
         }
-		cin >> top2;
-		cin >> lenght;
+		std::cin >> top2;
+		std::cin >> lenght;
 		elem.top1 = top1;
 		elem.top2 = top2;
 		elem.lenght = lenght;
@@ -88,14 +85,13 @@ void user_input(map<char, vector<pair<char, double >>>& nodes) {
 }
 
 int main() {
-	char top1;
-	char top2;
+	char top1, top2;
 	bool flag = false;
-	vector<char> way;
-	map<char, vector<pair<char, double >>> nodes;
+	std::vector<char> way;
+	std::map<char, std::vector<std::pair<char, double >>> nodes;
 	std::cout << "Для завершения ввода введите /" << '\n';
-	cin >> top1;
-	cin >> top2;
+	std::cin >> top1;
+	std::cin >> top2;
 
 	user_input(nodes);
 	sort_lenght(nodes);
@@ -103,7 +99,7 @@ int main() {
 	find_way(nodes, way, top1, top2, flag);
 
 	for (int i = 0; i < way.size(); i++) {
-		cout << way[i];
+		std::cout << way[i];
 	}
 
 	return 0;
