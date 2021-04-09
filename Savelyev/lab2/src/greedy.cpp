@@ -54,7 +54,7 @@ void find_way(std::map<char, std::vector<std::pair<char, double >>>& nodes, std:
     for (int i = 0; i < c; i++) {
 	find_way(nodes, way, nodes[top1][i].first, top2, flag);
 	if (flag) {
-		return;
+	    return;
         }
 	// удаляем вершину из пути
 	std::cout << "\nУбрали вершину "<< nodes[top1][i].first << "\n\n";
