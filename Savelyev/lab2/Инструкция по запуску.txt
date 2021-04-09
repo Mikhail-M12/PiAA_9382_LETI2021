@@ -1,0 +1,2 @@
+Ссылка на онлайн компилятор для запуска жадного алгоритма: https://replit.com/@Indiora/PiAAgreedylab2#main.cpp
+Ссылка на онлайн компилятор для запуска алгоритма А*: https://replit.com/@Indiora/PiAAAlab2#main.cpp
