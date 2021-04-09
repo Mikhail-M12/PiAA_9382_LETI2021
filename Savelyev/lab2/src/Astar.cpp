@@ -4,7 +4,6 @@
 #include <map>
 #include <ctime>
 
-using namespace std;
 
 
 struct Edge {
@@ -14,7 +13,7 @@ struct Edge {
 };
 
 // формирует список смежности вершин
-void make_list(map<char, vector<pair<char, double >>>& nodes, vector<Edge>& edge_mass) {
+void make_list(std::map<char, std::vector<std::pair<char, double >>>& nodes, std::vector<Edge>& edge_mass) {
 	char top1;
 	char top2;
 	double lenght;
@@ -23,15 +22,16 @@ void make_list(map<char, vector<pair<char, double >>>& nodes, vector<Edge>& edge
 		top1 = edge_mass[i].top1;
 		top2 = edge_mass[i].top2;
 		lenght = edge_mass[i].lenght;
-		nodes[top1].push_back(make_pair(top2, lenght));
+		nodes[top1].push_back(std::make_pair(top2, lenght));
 	}
 }
 
 // суммирует все ребра в графе
-int sum_edge(map<char, vector<pair<char, double >>>& nodes) {
+int sum_edge(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
     int sum = 0;
-    for(auto& item : nodes) {
-        for (int j = 0; j < nodes[item.first].size(); j++) {
+    for(const auto& item : nodes) {
+        int a = nodes[item.first].size();
+        for (int j = 0; j < a; j++) {
             sum += nodes[item.first][j].second;
         }
     }
@@ -39,7 +39,7 @@ int sum_edge(map<char, vector<pair<char, double >>>& nodes) {
 }
 
 // выводит ответ
-void print_answer( map <char, char> previous_top, char top) {
+void print_answer(std::map <char, char> previous_top, char top) {
     char last = top;
     std::vector<char> my_vector;
     // перебираем вершина от последней к первой
@@ -58,7 +58,7 @@ void print_answer( map <char, char> previous_top, char top) {
 }
 
 // переназначеам расстояние до вершин
-void change_distance(map<char, vector<pair<char, double >>> nodes, priority_queue<pair<double, char>>& top_queue, map <char, double>& distance , map <char, char>& previous_top, char top, char top2) {
+void change_distance(std::map<char, std::vector<std::pair<char, double >>> nodes, std::priority_queue<std::pair<double, char>>& top_queue, std::map <char, double>& distance , std::map <char, char>& previous_top, char top, char top2) {
     // перебираем все вершины смежные с top
     for (int i = 0; i < nodes[top].size(); i++) {
         // если нашли путь короче предыдущего, заменяем
@@ -68,33 +68,33 @@ void change_distance(map<char, vector<pair<char, double >>> nodes, priority_queu
             std::cout << "Длинна кратайшего пути до " << nodes[top][i].first << " изменена на " << distance[top] + nodes[top][i].second  <<'\n';
             previous_top[nodes[top][i].first] = top;
             // добовляем в очередь
-            top_queue.push(make_pair(-(distance[nodes[top][i].first] + (int)top2 - (int)nodes[top][i].first), nodes[top][i].first));
+            top_queue.push(std::make_pair(-(distance[nodes[top][i].first] + (int)top2 - (int)nodes[top][i].first), nodes[top][i].first));
             std::cout << "Занесли в очередь " << nodes[top][i].first << " f(x) = " << (distance[nodes[top][i].first] + (int)top2 - (int)nodes[top][i].first) << "\n\n";
         }
     }
 }
 
 // Алгорит А*
-void AStar(map<char, vector<pair<char, double >>>& nodes, char top1, char top2) {
-    priority_queue<pair<double, char>> top_queue;
-    map <char, double> distance ;
-    map <char, char> previous_top;
-    map <char, bool> visited_top;
+void AStar(std::map<char, std::vector<std::pair<char, double >>>& nodes, char top1, char top2) {
+    std::priority_queue<std::pair<double, char>> top_queue;
+    std::map <char, double> distance ;
+    std::map <char, char> previous_top;
+    std::map <char, bool> visited_top;
     int current_top;
     int min;
 
     double max_distance  = sum_edge(nodes);
 
     // заполняем map
-    for(auto& item : nodes) {
+    for(const auto& item : nodes) {
         distance[item.first] = max_distance ;
     }
 
-    for(auto& item : nodes) {
+    for(const auto& item : nodes) {
         visited_top[item.first] = false;
     }
 
-    for(auto& item : nodes) {
+    for(const auto& item : nodes) {
         previous_top[item.first] = '!';
     }
 
@@ -105,7 +105,7 @@ void AStar(map<char, vector<pair<char, double >>>& nodes, char top1, char top2) 
     previous_top[top1] = '*';
 
     // добовляем стартовую вершину в очередь
-    top_queue.push(make_pair(0, top1));
+    top_queue.push(std::make_pair(0, top1));
     std::cout << "Занесли в очередь " << top1 << " f(x) = "<< 0 << "\n\n";
     // пока очередь не опустеет
     while (!top_queue.empty()) {
@@ -115,7 +115,7 @@ void AStar(map<char, vector<pair<char, double >>>& nodes, char top1, char top2) 
                 break;
             }
             // считываем вершину из очереди
-            pair<double, char> current_min = top_queue.top();
+            std::pair<double, char> current_min = top_queue.top();
             top_queue.pop();
             current_top = current_min.second;
             min = -current_min.first;
@@ -137,19 +137,19 @@ void AStar(map<char, vector<pair<char, double >>>& nodes, char top1, char top2) 
 }
 
 // считывает ввод пользователя
-void user_input(map<char, vector<pair<char, double >>>& nodes) {
-    vector<Edge> edge_mass;
+void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
+    std::vector<Edge> edge_mass;
 	Edge elem;
 	char top1;
 	char top2;
 	top1 = ' ';
 	double lenght;
-	while (cin >> top1) {
+	while (std::cin >> top1) {
 		if (!top1 || top1 == '/') {
 			break;
         }
-		cin >> top2;
-		cin >> lenght;
+		std::cin >> top2;
+		std::cin >> lenght;
 		elem.top1 = top1;
 		elem.top2 = top2;
 		elem.lenght = lenght;
@@ -161,14 +161,12 @@ void user_input(map<char, vector<pair<char, double >>>& nodes) {
 
 int main() {
     srand(static_cast<unsigned int>(time(0)));
-    char top1;
-    char top2;
-    char top3;
+    char top1, top2, top3;
     std::cout << "Для завершения ввода введите /" << '\n';
-    cin >> top1;
-    cin >> top2;
-    cin >> top3;
-    map<char, vector<pair<char, double >>> nodes;
+    std::cin >> top1;
+    std::cin >> top2;
+    std::cin >> top3;
+    std::map<char, std::vector<std::pair<char, double >>> nodes;
     user_input(nodes);
     // выбираеv какая вершина будет финишом
     std::cout << rand() % 2 << '\n';
