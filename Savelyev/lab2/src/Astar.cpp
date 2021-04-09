@@ -14,15 +14,16 @@ struct Edge {
 
 // формирует список смежности вершин
 void make_list(std::map<char, std::vector<std::pair<char, double >>>& nodes, std::vector<Edge>& edge_mass) {
-	char top1;
-	char top2;
-	double lenght;
+    char top1;
+    char top2;
+    double lenght;
     // edge_mass.size() - кол-во ребер
-	for (int i = 0; i < edge_mass.size(); i++) {
-		top1 = edge_mass[i].top1;
-		top2 = edge_mass[i].top2;
-		lenght = edge_mass[i].lenght;
-		nodes[top1].push_back(std::make_pair(top2, lenght));
+    int c = edge_mass.size();
+    for (int i = 0; i < c; i++) {
+	top1 = edge_mass[i].top1;
+        top2 = edge_mass[i].top2;
+	lenght = edge_mass[i].lenght;
+	nodes[top1].push_back(std::make_pair(top2, lenght));
 	}
 }
 
@@ -60,7 +61,8 @@ void print_answer(std::map <char, char> previous_top, char top) {
 // переназначеам расстояние до вершин
 void change_distance(std::map<char, std::vector<std::pair<char, double >>> nodes, std::priority_queue<std::pair<double, char>>& top_queue, std::map <char, double>& distance , std::map <char, char>& previous_top, char top, char top2) {
     // перебираем все вершины смежные с top
-    for (int i = 0; i < nodes[top].size(); i++) {
+    int h = nodes[top].size();
+    for (int i = 0; i < h; i++) {
         // если нашли путь короче предыдущего, заменяем
         if (distance[nodes[top][i].first] > distance[top] + nodes[top][i].second) {
             distance[nodes[top][i].first] = distance[top] + nodes[top][i].second;
@@ -139,22 +141,22 @@ void AStar(std::map<char, std::vector<std::pair<char, double >>>& nodes, char to
 // считывает ввод пользователя
 void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
     std::vector<Edge> edge_mass;
-	Edge elem;
-	char top1;
-	char top2;
-	top1 = ' ';
-	double lenght;
-	while (std::cin >> top1) {
-		if (!top1 || top1 == '/') {
-			break;
+    Edge elem;
+    char top1;
+    char top2;
+    top1 = ' ';
+    double lenght;
+    while (std::cin >> top1) {
+	if (!top1 || top1 == '/') {
+	    break;
         }
-		std::cin >> top2;
-		std::cin >> lenght;
-		elem.top1 = top1;
-		elem.top2 = top2;
-		elem.lenght = lenght;
+	std::cin >> top2;
+	std::cin >> lenght;
+	elem.top1 = top1;
+	elem.top2 = top2;
+	elem.lenght = lenght;
         // добавляем в массив
-		edge_mass.push_back(elem);
+	edge_mass.push_back(elem);
 	}
 	make_list(nodes, edge_mass);
 }
