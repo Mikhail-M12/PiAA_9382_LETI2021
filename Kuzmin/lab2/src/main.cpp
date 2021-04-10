@@ -8,7 +8,7 @@
 #include <functional>
 #include <queue>
 #include <string>
-#define debugdetails 0
+//#define debugdetails 0
 #define length 0 //для вывода длины пути
 
 //вершина графа
@@ -105,9 +105,16 @@ public:
         char verName1;
         char verName2;
         float distance;
-
-        std::string tmp;
         std::ifstream file("tests/input.txt");
+        std::cout << "Ввод:\n";
+        std::string tmp;
+        while (std::getline(file, tmp)) {
+            std::cout << tmp << "\n";
+        }
+        std::cout << "\n";
+        file.close();
+        file.open("tests/input.txt");
+       
         std::getline(file, tmp);
         root = tmp[0];
         goal = tmp[2];
@@ -181,7 +188,7 @@ void aStar(Graph a, char name1, char name2, char name3) {
         v1_name = v2_name;
     }
     else {
-        std::cout << "Пути не существует\n";
+        std::cout << "\nПути не существует\n";
         return;
     }
 
@@ -290,7 +297,7 @@ void aStar(Graph a, char name1, char name2, char name3) {
     }
 
     if (!finish1 && !finish2) {
-        std::cout << "Пути не существует\n";
+        std::cout << "\nПути не существует\n";
         return;
 
     }
@@ -306,9 +313,9 @@ void aStar(Graph a, char name1, char name2, char name3) {
         path.push_front(t);
     }
     float count = 0;
-#ifdef debugdetails
+
     std::cout << "\nНайденный путь: ";
-#endif
+
     for (auto it : path) {
         std::cout << it.name;
     }
@@ -372,7 +379,7 @@ void greedy(Graph a, char name1, char name2) {
             block.push_back(path.back());
             path.pop_back();
             if (path.empty()) {
-                std::cout << "Пути не существует\n";
+                std::cout << "\nПути не существует\n";
                 return;
             }
 #ifdef debugdetails
@@ -386,9 +393,9 @@ void greedy(Graph a, char name1, char name2) {
         }
     }
     //вывод
-#ifdef debugdetails
+
     std::cout << "\nНайденный путь: ";
-#endif
+
     for (auto it : path)
         std::cout << it.name;
 #ifdef length
@@ -404,14 +411,15 @@ int main()
     a.input();
 
 
-#ifdef debugdetails
-    std::cout << "Жадный алгоритм \nНачало - " << a.root << ", конец - " << a.goal;
-#endif
+
+    std::cout << "\nЖадный алгоритм \nНачало - " << a.root << ", конец - " << a.goal;
+
     greedy(a, a.root, a.goal);
 
-#ifdef debugdetails
-    std::cout << "\n\nA* \nНачало - " << a.root << ", конец - " << a.goal;
+
+    std::cout << "\nA* \nНачало - " << a.root << ", конец - " << a.goal;
     if (a.goal2 != a.goal) std::cout << " или " << a.goal2;
+#ifdef debugdetails
     std::cout << "\nВ скобках указывается значение f вершины\n";
 #endif
     aStar(a, a.root, a.goal, a.goal2);
