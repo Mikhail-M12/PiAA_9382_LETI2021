@@ -8,7 +8,7 @@
 #include <functional>
 #include <queue>
 #include <string>
-//#define debugdetails 0
+#define debugdetails 0
 #define length 0 //для вывода длины пути
 
 //вершина графа
@@ -60,14 +60,13 @@ bool isInVector(T vec, Vertex v) {
     for (auto it : vec)
         if (it.name == v.name)return true;
     return false;
-
 }
 //граф
 class Graph {
 public:
     std::vector<Vertex> vertexVector;
 
-    bool isInGraph(char verName) {
+    bool isInGraph(char verName){
         for (auto it : vertexVector)
             if (it.name == verName)
                 return true;
@@ -155,11 +154,8 @@ int heuristic(Vertex v1, Vertex v2, Vertex v3) {
     if (a1 < a2) return a1;
     else return a2;
 }
-
 //алгоритм A*
-void aStar(Graph a, char name1, char name2, char name3) {
-
-
+void aStar(Graph graph, char name1, char name2, char name3) {
 
     //очередь с приоритетом для просмотра вершин
     auto cmp = [&](Vertex* v1, Vertex* v2) {
@@ -174,17 +170,17 @@ void aStar(Graph a, char name1, char name2, char name3) {
     Vertex v1_name;
     Vertex v2_name;
 
-    if (a(name2) && a(name3)) {
-        v1_name = *a(name2);
-        v2_name = *a(name3);
+    if (graph(name2) && graph(name3)) {
+        v1_name = *graph(name2);
+        v2_name = *graph(name3);
     }
-    else if (a(name2)) {
-        v1_name = *a(name2);
+    else if (graph(name2)) {
+        v1_name = *graph(name2);
         v2_name = v1_name;
 
     }
-    else if (a(name3)) {
-        v2_name = *a(name3);
+    else if (graph(name3)) {
+        v2_name = *graph(name3);
         v1_name = v2_name;
     }
     else {
@@ -192,19 +188,17 @@ void aStar(Graph a, char name1, char name2, char name3) {
         return;
     }
 
-
     bool finish1 = false;
     bool finish2 = false;
 
-    a(name1)->g = 0;
-    a(name1)->f = heuristic(*a(name1), v1_name, v2_name);
+    graph(name1)->g = 0;
+    graph(name1)->f = heuristic(*graph(name1), v1_name, v2_name);
 
 #ifdef debugdetails
-    std::cout << "\nНачальная вершина " << *a(name1) << " добавлена в очередь";
+    std::cout << "\nНачальная вершина " << *graph(name1) << " добавлена в очередь";
 #endif 
 
-    opened.push(a(name1));
-
+    opened.push(graph(name1));
     //основной цикл
     while (!opened.empty()) {
         Vertex* current = opened.top();
@@ -215,7 +209,6 @@ void aStar(Graph a, char name1, char name2, char name3) {
         std::cout << "Вершина " << current->name << " извлечена из очереди\n";
         std::cout << "Просмотр вершины " << current->name << "\n";
 #endif
-
         finish1 = current->name == v1_name.name;
         finish2 = current->name == v2_name.name;
 
@@ -226,13 +219,12 @@ void aStar(Graph a, char name1, char name2, char name3) {
             break;
         }
 
-
         opened.pop();
         closed.push_back(*current);
 
         for (auto neighbour : current->neighbours) {
 
-            Vertex* it = a(neighbour.second.name);
+            Vertex* it = graph(neighbour.second.name);
             float tmp = current->g + neighbour.first;
 
 #ifdef debugdetails
@@ -240,7 +232,6 @@ void aStar(Graph a, char name1, char name2, char name3) {
             std::cout << "Новое расстояние: " << tmp << std::endl;
             std::cout << "Уже известное расстояние g до данного соседа: " << it->g << std::endl;
 #endif
-
             //если путь через текущую вершину до соседа больше чем уже уже имеющейся
             if (tmp >= it->g && isInVector(closed, *it)) {
 
@@ -249,23 +240,20 @@ void aStar(Graph a, char name1, char name2, char name3) {
 #endif
                 continue;
             }
-
             //обновление пути до соседа
             else if (tmp < it->g) {
 #ifdef debugdetails
                 std::cout << "Создан новый путь к " << *it << " через " << current->name << ": " << tmp << "\n";
 #endif
                 float s = it->f;
-                it->camefrom = a(current->name);
+                it->camefrom = graph(current->name);
                 it->g = tmp;
                 it->f = tmp + heuristic(*it, v1_name, v2_name);
 
 #ifdef debugdetails
                 std::cout << "Обновление f " << s << " -> " << it->f << "\n";
 #endif
-
             }
-
             //добавление вершины в очередь
             if (!isInQueue(opened, *it)) {
 #ifdef debugdetails
@@ -273,8 +261,6 @@ void aStar(Graph a, char name1, char name2, char name3) {
 #endif
                 opened.push(it);
             }
-
-
             //обновление очереди
             else {
 #ifdef debugdetails
@@ -299,11 +285,10 @@ void aStar(Graph a, char name1, char name2, char name3) {
     if (!finish1 && !finish2) {
         std::cout << "\nПути не существует\n";
         return;
-
     }
 
     //вывод
-    Vertex t = (finish1) ? *a(name2) : *a(name3);
+    Vertex t = (finish1) ? *graph(name2) : *graph(name3);
 
     float distance = t.g;
     path.push_front(t);
@@ -323,18 +308,17 @@ void aStar(Graph a, char name1, char name2, char name3) {
 #ifdef length
     std::cout << "\nдлина: " << distance;
 #endif
-
 }
 
 //функция, реализующая жадный алгоритм
-void greedy(Graph a, char name1, char name2) {
-	
-	std::vector<Vertex> path;
+void greedy(Graph graph, char name1, char name2) {
+
+    std::vector<Vertex> path;
     std::vector<Vertex> block;
     float count = 0;
     float lastdistance = 0;
 
-    path.push_back(*a(name1));
+    path.push_back(*graph(name1));
 
 #ifdef debugdetails
     std::cout << "\n\nПереход к начальной вершине " << name1 << "\n";
@@ -354,30 +338,26 @@ void greedy(Graph a, char name1, char name2) {
                     std::cout << " (уже посещена)";
                     break;
                 }
-
             }
             std::cout << "\n";
         }
         std::cout << "\n";
 #endif
-
         //если найден путь из данной вершины
         if (nextVertex.second.name != '-') {
 #ifdef debugdetails
             std::cout << "Переход к вершине " << nextVertex.second.name << "\n";
 #endif
             count += nextVertex.first;
-            path.push_back(*a(nextVertex.second.name));
+            path.push_back(*graph(nextVertex.second.name));
             block.push_back(path.back());
             lastdistance = nextVertex.first;
-        }
-
-        //если не найден, переход к последней
+    }
+       //если не найден, переход к последней
         else {
 #ifdef debugdetails
             std::cout << "Нет доступных путей из вершины " << path.back().name << "\nВозврат к предыдущей вершине ";
 #endif
-
             block.push_back(path.back());
             path.pop_back();
             if (path.empty()) {
@@ -388,8 +368,8 @@ void greedy(Graph a, char name1, char name2) {
             std::cout << path.back().name << "\n";
 #endif
             count -= lastdistance;
-        }
-    }
+            }
+}
     //вывод
 
     std::cout << "\nНайденный путь: ";
@@ -403,23 +383,20 @@ void greedy(Graph a, char name1, char name2) {
 
 int main()
 {
-    Graph a;
+    Graph graph;
     setlocale(LC_ALL, "rus");
-    a.input();
+    graph.input();
 
+    std::cout << "\nЖадный алгоритм \nНачало - " << graph.root << ", конец - " << graph.goal;
 
+    greedy(graph, graph.root, graph.goal);
 
-    std::cout << "\nЖадный алгоритм \nНачало - " << a.root << ", конец - " << a.goal;
-
-    greedy(a, a.root, a.goal);
-
-
-    std::cout << "\nA* \nНачало - " << a.root << ", конец - " << a.goal;
-    if (a.goal2 != a.goal) std::cout << " или " << a.goal2;
+    std::cout << "\nA* \nНачало - " << graph.root << ", конец - " << graph.goal;
+    if (graph.goal2 != graph.goal) std::cout << " или " << graph.goal2;
 #ifdef debugdetails
     std::cout << "\nВ скобках указывается значение f вершины\n";
 #endif
-    aStar(a, a.root, a.goal, a.goal2);
+    aStar(graph, graph.root, graph.goal, graph.goal2);
     std::cout << "\n";
     return 0;
 }
