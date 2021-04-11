@@ -328,10 +328,11 @@ void aStar(Graph a, char name1, char name2, char name3) {
 
 //функция, реализующая жадный алгоритм
 void greedy(Graph a, char name1, char name2) {
-
-    std::vector<Vertex> path;
+	
+	std::vector<Vertex> path;
     std::vector<Vertex> block;
     float count = 0;
+    float lastdistance = 0;
 
     path.push_back(*a(name1));
 
@@ -368,6 +369,7 @@ void greedy(Graph a, char name1, char name2) {
             count += nextVertex.first;
             path.push_back(*a(nextVertex.second.name));
             block.push_back(path.back());
+            lastdistance = nextVertex.first;
         }
 
         //если не найден, переход к последней
@@ -385,12 +387,7 @@ void greedy(Graph a, char name1, char name2) {
 #ifdef debugdetails
             std::cout << path.back().name << "\n";
 #endif
-            for (auto it : path.back().neighbours) {
-                if (it.second.name == block.back().name){
-                    count -= it.first;
-					break;
-				}
-            }
+            count -= lastdistance;
         }
     }
     //вывод
@@ -402,7 +399,6 @@ void greedy(Graph a, char name1, char name2) {
 #ifdef length
     std::cout << "\nдлина: " << count << "\n";
 #endif
-
 }
 
 int main()
