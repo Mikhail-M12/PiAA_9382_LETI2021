@@ -26,12 +26,11 @@ void make_list(std::map<char, std::vector<std::pair<char, double >>>& nodes, std
     char top1;
     char top2;
     double length;
-    // edge_mass.size() - кол-во ребер
     int d = edge_mass.size();
-    for (int i = 0; i < d; i++) {
-	top1 = edge_mass[i].top1;
-	top2 = edge_mass[i].top2;
-	length = edge_mass[i].length;
+    for(auto& i: edge_mass) {
+	top1 = i.top1;
+	top2 = i.top2;
+	length = i.length;
 	nodes[top1].push_back(std::make_pair(top2, length));
     }
 }
@@ -46,20 +45,19 @@ void find_way(std::map<char, std::vector<std::pair<char, double >>>& nodes, std:
 	flag = true;
 	return;
     }
-    int c = nodes[top1].size();
     std::cout << "Список смежных вершин с " << top1  << '\n';
-    for (int i = 0; i < c; i++) {
-	std::cout << nodes[top1][i].first << " " << nodes[top1][i].second << '\n';
+    for(auto& i: nodes[top1]) {
+	std::cout << i.first << " " << i.second << '\n';
     }
-    for (int i = 0; i < c; i++) {
-	find_way(nodes, way, nodes[top1][i].first, top2, flag);
+    for(auto& j: nodes[top1]) {
+	find_way(nodes, way, j.first, top2, flag);
 	if (flag) {
 	    return;
         }
 	// удаляем вершину из пути
-	std::cout << "\nУбрали вершину "<< nodes[top1][i].first << "\n\n";
+	std::cout << "\nУбрали вершину "<< j.first << "\n\n";
 	way.pop_back();
-	}
+    }
 }
 
 // считывает ввод пользователя
@@ -81,7 +79,7 @@ void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
 	elem.length = length;
 	// добавляем в массив
 	edge_mass.push_back(elem);
-	}
+    }
 
     make_list(nodes, edge_mass);
 }
@@ -94,14 +92,13 @@ int main() {
     std::cout << "Для завершения ввода введите /" << '\n';
     std::cin >> top1;
     std::cin >> top2;
-	
+
     user_input(nodes);
     sort_length(nodes);
 
     find_way(nodes, way, top1, top2, flag);
-    int b = way.size();
-    for (int i = 0; i < b; i++) {
-	std::cout << way[i];
+    for(auto& i: way) {
+	std::cout << i;
     }
 
     return 0;
