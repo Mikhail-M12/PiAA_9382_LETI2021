@@ -107,7 +107,7 @@ void AStar(std::map<char, std::vector<std::pair<char, double >>>& nodes, char to
     std::cout << "Занесли в очередь " << top1 << " f(x) = "<< 0 << "\n\n";
     // пока очередь не опустеет
     while (!top_queue.empty()) {
-        while (1) {
+        while (true) {
             // если очередь пуста
             if (top_queue.empty()) {
                 break;
@@ -144,7 +144,7 @@ void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
     double length;
     while (std::cin >> top1) {
 	if (!top1 || top1 == '/') {
-		break;
+	    break;
         }
 	std::cin >> top2;
 	std::cin >> length;
