@@ -9,31 +9,28 @@
 struct Edge {
     char top1; // вершина из которой выходит ребро
     char top2; // вершина в которую входит ребро
-    double lenght; // длинна ребра
+    double length; // длинна ребра
 };
 
 // формирует список смежности вершин
 void make_list(std::map<char, std::vector<std::pair<char, double >>>& nodes, std::vector<Edge>& edge_mass) {
     char top1;
     char top2;
-    double lenght;
-    // edge_mass.size() - кол-во ребер
-    int c = edge_mass.size();
-    for (int i = 0; i < c; i++) {
-	top1 = edge_mass[i].top1;
-        top2 = edge_mass[i].top2;
-	lenght = edge_mass[i].lenght;
-	nodes[top1].push_back(std::make_pair(top2, lenght));
-	}
+    double length;
+    for (auto& i: edge_mass) {
+	top1 = i.top1;
+	top2 = i.top2;
+	length = i.length;
+	nodes[top1].push_back(std::make_pair(top2, length));
+    }
 }
 
 // суммирует все ребра в графе
 int sum_edge(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
     int sum = 0;
     for(const auto& item : nodes) {
-        int a = nodes[item.first].size();
-        for (int j = 0; j < a; j++) {
-            sum += nodes[item.first][j].second;
+        for(const auto& i: nodes[item.first]) {
+            sum += i.second;
         }
     }
     return sum + 1;
@@ -50,7 +47,7 @@ void print_answer(std::map <char, char> previous_top, char top) {
         top = previous_top[top];
     }
     // выводи вершины в правильном порядке
-    for (auto it = my_vector.rbegin(); it != my_vector.rend(); ++it) {
+    for (auto& it = my_vector.rbegin(); it != my_vector.rend(); ++it) {
         std::cout << *it;
     }
     // последняя вершина
@@ -61,17 +58,16 @@ void print_answer(std::map <char, char> previous_top, char top) {
 // переназначеам расстояние до вершин
 void change_distance(std::map<char, std::vector<std::pair<char, double >>> nodes, std::priority_queue<std::pair<double, char>>& top_queue, std::map <char, double>& distance , std::map <char, char>& previous_top, char top, char top2) {
     // перебираем все вершины смежные с top
-    int h = nodes[top].size();
-    for (int i = 0; i < h; i++) {
+    for(auto& i: nodes[top]) {
         // если нашли путь короче предыдущего, заменяем
-        if (distance[nodes[top][i].first] > distance[top] + nodes[top][i].second) {
-            distance[nodes[top][i].first] = distance[top] + nodes[top][i].second;
+        if (distance[i.first] > distance[top] + i.second) {
+            distance[i.first] = distance[top] + i.second;
             // меняем предыдущую вершину
-            std::cout << "Длинна кратайшего пути до " << nodes[top][i].first << " изменена на " << distance[top] + nodes[top][i].second  <<'\n';
-            previous_top[nodes[top][i].first] = top;
+            std::cout << "Длинна кратайшего пути до " << i.first << " изменена на " << distance[top] + i.second  <<'\n';
+            previous_top[i.first] = top;
             // добовляем в очередь
-            top_queue.push(std::make_pair(-(distance[nodes[top][i].first] + (int)top2 - (int)nodes[top][i].first), nodes[top][i].first));
-            std::cout << "Занесли в очередь " << nodes[top][i].first << " f(x) = " << (distance[nodes[top][i].first] + (int)top2 - (int)nodes[top][i].first) << "\n\n";
+            top_queue.push(std::make_pair(-(distance[i.first] + (int)top2 - (int)i.first), i.first));
+            std::cout << "Занесли в очередь " << i.first << " f(x) = " << (distance[i.first] + (int)top2 - (int)i.first) << "\n\n";
         }
     }
 }
@@ -145,20 +141,20 @@ void user_input(std::map<char, std::vector<std::pair<char, double >>>& nodes) {
     char top1;
     char top2;
     top1 = ' ';
-    double lenght;
+    double length;
     while (std::cin >> top1) {
 	if (!top1 || top1 == '/') {
-	    break;
+		break;
         }
 	std::cin >> top2;
-	std::cin >> lenght;
+	std::cin >> length;
 	elem.top1 = top1;
 	elem.top2 = top2;
-	elem.lenght = lenght;
+	elem.length = length;
         // добавляем в массив
 	edge_mass.push_back(elem);
-	}
-	make_list(nodes, edge_mass);
+    }
+    make_list(nodes, edge_mass);
 }
 
 int main() {
