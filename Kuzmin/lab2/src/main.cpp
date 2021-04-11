@@ -386,9 +386,10 @@ void greedy(Graph a, char name1, char name2) {
             std::cout << path.back().name << "\n";
 #endif
             for (auto it : path.back().neighbours) {
-                if (it.second.name == block.back().name)
+                if (it.second.name == block.back().name){
                     count -= it.first;
-                break;
+					break;
+				}
             }
         }
     }
