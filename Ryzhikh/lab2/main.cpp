@@ -24,9 +24,9 @@ private:
     int number;
 };
 
-struct Sorting { //функция сортировки для приоритетной очереди
+struct Sorting { //С„СѓРЅРєС†РёСЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РґР»СЏ РїСЂРёРѕСЂРёС‚РµС‚РЅРѕР№ РѕС‡РµСЂРµРґРё
     bool operator() (pair<char, double> a, pair<char, double> b) {
-        //если стоимость двух вершин равна, то возвращается меньшая из них в алфавитном порядке, если стоимость разная, то большая из них
+        //РµСЃР»Рё СЃС‚РѕРёРјРѕСЃС‚СЊ РґРІСѓС… РІРµСЂС€РёРЅ СЂР°РІРЅР°, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РјРµРЅСЊС€Р°СЏ РёР· РЅРёС… РІ Р°Р»С„Р°РІРёС‚РЅРѕРј РїРѕСЂСЏРґРєРµ, РµСЃР»Рё СЃС‚РѕРёРјРѕСЃС‚СЊ СЂР°Р·РЅР°СЏ, С‚Рѕ Р±РѕР»СЊС€Р°СЏ РёР· РЅРёС…
         if (a.second == b.second)
             return (a.first < b.first);
         else
@@ -38,32 +38,32 @@ int FindingPath::Heuristic(char a, char b) {
     return abs(a-b);
 }
 
-vector<char> FindingPath::AStar() {  //А*
-    map<char, pair<vector<char>, double>> ShortPathes;  //текущие кратчайшие пути
+vector<char> FindingPath::AStar() {  //Рђ*
+    map<char, pair<vector<char>, double>> ShortPathes;  //С‚РµРєСѓС‰РёРµ РєСЂР°С‚С‡Р°Р№С€РёРµ РїСѓС‚Рё
     vector<char> vertex;
-    priority_queue < pair<char, double>, vector<pair<char, double>>, Sorting> PriorityQueue; //очередь в алгоритме
+    priority_queue < pair<char, double>, vector<pair<char, double>>, Sorting> PriorityQueue; //РѕС‡РµСЂРµРґСЊ РІ Р°Р»РіРѕСЂРёС‚РјРµ
 
     PriorityQueue.push({ start, 0 });
     vertex.push_back(start);
     ShortPathes[start].first = vertex;
 
-    while (!PriorityQueue.empty()) {  //пока очередь не пуста
-        if (PriorityQueue.top().first == end) {  //если найдена конечная вершина
-            return ShortPathes[end].first;  //то заканчивается поиск
+    while (!PriorityQueue.empty()) {  //РїРѕРєР° РѕС‡РµСЂРµРґСЊ РЅРµ РїСѓСЃС‚Р°
+        if (PriorityQueue.top().first == end) {  //РµСЃР»Рё РЅР°Р№РґРµРЅР° РєРѕРЅРµС‡РЅР°СЏ РІРµСЂС€РёРЅР°
+            return ShortPathes[end].first;  //С‚Рѕ Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РїРѕРёСЃРє
         }
 
-        auto TmpVertex = PriorityQueue.top();  //достается приоритетная вершина из очереди
+        auto TmpVertex = PriorityQueue.top();  //РґРѕСЃС‚Р°РµС‚СЃСЏ РїСЂРёРѕСЂРёС‚РµС‚РЅР°СЏ РІРµСЂС€РёРЅР° РёР· РѕС‡РµСЂРµРґРё
         PriorityQueue.pop();
 
-        for (auto& i : graph[TmpVertex.first]) {  //рассматриваются все вершины, которые соединены с текущей вершиной
+        for (auto& i : graph[TmpVertex.first]) {  //СЂР°СЃСЃРјР°С‚СЂРёРІР°СЋС‚СЃСЏ РІСЃРµ РІРµСЂС€РёРЅС‹, РєРѕС‚РѕСЂС‹Рµ СЃРѕРµРґРёРЅРµРЅС‹ СЃ С‚РµРєСѓС‰РµР№ РІРµСЂС€РёРЅРѕР№
             double CurLength = ShortPathes[TmpVertex.first].second + i.second;
-            if (ShortPathes[i.first].second == 0 || ShortPathes[i.first].second > CurLength) { //если пути нет или найденный путь короче
-                vector<char> path = ShortPathes[TmpVertex.first].first;  //добавляется в путь родительской вершины текущая вершина с кратчайшим путем
+            if (ShortPathes[i.first].second == 0 || ShortPathes[i.first].second > CurLength) { //РµСЃР»Рё РїСѓС‚Рё РЅРµС‚ РёР»Рё РЅР°Р№РґРµРЅРЅС‹Р№ РїСѓС‚СЊ РєРѕСЂРѕС‡Рµ
+                vector<char> path = ShortPathes[TmpVertex.first].first;  //РґРѕР±Р°РІР»СЏРµС‚СЃСЏ РІ РїСѓС‚СЊ СЂРѕРґРёС‚РµР»СЊСЃРєРѕР№ РІРµСЂС€РёРЅС‹ С‚РµРєСѓС‰Р°СЏ РІРµСЂС€РёРЅР° СЃ РєСЂР°С‚С‡Р°Р№С€РёРј РїСѓС‚РµРј
                 path.push_back(i.first);
-                ShortPathes[i.first] = { path, CurLength };  //обновление пути и расстояния
+                ShortPathes[i.first] = { path, CurLength };  //РѕР±РЅРѕРІР»РµРЅРёРµ РїСѓС‚Рё Рё СЂР°СЃСЃС‚РѕСЏРЅРёСЏ
                 int heur = Heuristic(end, i.first);
                 //cout << i.first << ' ' << heuristic[i.first] << '\n';
-                PriorityQueue.push({ i.first, heur + ShortPathes[i.first].second }); //записывается в очередь текущая вершина 
+                PriorityQueue.push({ i.first, heur + ShortPathes[i.first].second }); //Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ РІ РѕС‡РµСЂРµРґСЊ С‚РµРєСѓС‰Р°СЏ РІРµСЂС€РёРЅР° 
             }
 
         }
@@ -76,14 +76,14 @@ vector<char> FindingPath::AStar() {  //А*
 
 void FindingPath::Sort() {
     for (auto it = graph.begin(); it != graph.end(); ++it) {
-        cout << "Для вершины " << it->first << " есть следующие смежные вершины:\n";
+        cout << "Р”Р»СЏ РІРµСЂС€РёРЅС‹ " << it->first << " РµСЃС‚СЊ СЃР»РµРґСѓСЋС‰РёРµ СЃРјРµР¶РЅС‹Рµ РІРµСЂС€РёРЅС‹:\n";
         for (int i = 0; i < it->second.size(); i++) {
             cout << it->second[i].first << '(' << it->second[i].second << ')' << ' ';
         }
         cout << endl;
         std::sort(it->second.begin(), it->second.end(), [](pair<char, double>& a, pair<char, double>& b) -> bool {return a.second < b.second; });
     
-        cout << "Отсортированные вершины:\n";
+        cout << "РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Рµ РІРµСЂС€РёРЅС‹:\n";
         for (int j = 0; j < it->second.size(); j++) {
             cout << it->second[j].first << '(' << it->second[j].second << ')' << ' ';
         }
@@ -100,7 +100,7 @@ void FindingPath::Read() {
     int count = 0;
 
     while (cin >> start) {
-        if (start == '0')  //символ остановки ввода данных
+        if (start == '0')  //СЃРёРјРІРѕР» РѕСЃС‚Р°РЅРѕРІРєРё РІРІРѕРґР° РґР°РЅРЅС‹С…
             break;
         double weight;
         cin >> end >> weight;
@@ -158,7 +158,7 @@ int main() {
     answer.Read();
     answer.Sort();
     vector<char> out = answer.AStar();
-    cout << "Ответ:";
+    cout << "РћС‚РІРµС‚:";
     for (auto& i : out) {
         cout << i;
     }
