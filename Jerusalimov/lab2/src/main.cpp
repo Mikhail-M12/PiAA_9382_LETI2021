@@ -29,11 +29,11 @@ struct Vertex {
         used = false;
         prev = nullptr;
         sum = 0;
-        heuristic = 0;
+        priority = 0;
     }
 
     double sum;
-    double heuristic;
+    double priority;
     char name;
     bool used;
     Vertex *prev;
@@ -43,14 +43,14 @@ struct Vertex {
 
 struct CmpAstar {
     bool operator()(Vertex *v1, Vertex *v2) {//for queue
-        if (v1->heuristic == v2->heuristic) {
+        if (v1->priority == v2->priority) {
             return v2->name > v1->name;
         }
-        return (v2->heuristic) < (v1->heuristic);
+        return (v2->priority) < (v1->priority);
     }
 
     bool cmpAstar(Vertex *num1, double num2) {//for nums
-        return num1->heuristic > num2;
+        return num1->priority > num2;
     }
 };
 
@@ -253,7 +253,7 @@ public:
     void printQueue(priority_queue<Vertex *, std::vector<Vertex *>, T> queue) {
         while (!queue.empty()) {
             if (typeid(T) != typeid(CmpDijkstra))
-                cout << "{ " << queue.top()->name << ", " << queue.top()->heuristic << "}";
+                cout << "{ " << queue.top()->name << ", " << queue.top()->priority << "}";
             else
                 cout << "{ " << queue.top()->name << ", " << queue.top()->sum << "}";
             queue.pop();
@@ -298,7 +298,7 @@ public:
                 if (!choiseAlgorithm)
                     cout<<quequeAstar.top()->sum << "}" << " and put it in a temporary variable\n";
                 else
-                    cout<<quequeAstar.top()->heuristic << "}" << " and put it in a temporary variable\n";
+                    cout<<quequeAstar.top()->priority << "}" << " and put it in a temporary variable\n";
 
 
             }
@@ -336,7 +336,7 @@ public:
                     if (PRINT) {
                         if (choiseAlgorithm) {
                             cout << "\t\t\tThe current  heuristic function is less than the previous one ("
-                                 << temp->name << "), write a new value\n\t\t\t" << temp->heuristic << " > "
+                                 << temp->name << "), write a new value\n\t\t\t" << temp->priority << " > "
                                  << tempHeuristic << " ; " << temp->name << " = " << tempHeuristic << "\n";
                         } else {
                             cout << "\t\t\tThe current summ is less than the previous one (" << temp->name
@@ -345,7 +345,7 @@ public:
                                  << current->sum + neighbour->mass << "\n";
                         }
                     }
-                    temp->heuristic = tempHeuristic;
+                    temp->priority = tempHeuristic;
                     temp->sum = current->sum + neighbour->mass;
                     temp->prev = current;
                     if (PRINT) {
@@ -359,15 +359,15 @@ public:
 
                     }
 
-                } else if (choiseAlgorithm ? temp->heuristic == 0 : temp->sum == 0) {
+                } else if (choiseAlgorithm ? temp->priority == 0 : temp->sum == 0) {
 
-                    temp->heuristic = tempHeuristic;
+                    temp->priority = tempHeuristic;
                     temp->sum = current->sum + neighbour->mass;
                     temp->prev = current;
                     quequeAstar.push(temp);
                     if (PRINT) {
                         if (choiseAlgorithm) {
-                            cout << "\t\t\tnew priority for \'" << temp->name << "\' = " << temp->heuristic
+                            cout << "\t\t\tnew priority for \'" << temp->name << "\' = " << temp->priority
                                  << " \n";
                         } else {
                             cout << "\t\t\tThe new sum of paths for \'" << temp->name << "\' = " << temp->sum << " \n";
@@ -454,14 +454,3 @@ int main() {
     system("pause>nul");
     return 0;
 }
-//a g
-//a b 3.0
-//a c 1.0
-//b d 2.0
-//b e 1.0
-//d e 4.0
-//e a 1.0
-//e f 1.0
-//a g 8.0
-//f g 1.0
-//)
