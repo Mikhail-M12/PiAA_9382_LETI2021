@@ -1,7 +1,8 @@
 Ссылка на онлайн компилятор(алгоритм А*):
-https://replit.com/@RyzhikhRoman/Lab2#main.cpp
-Ссалка на онлайн компилятор(жадный алгоритм):
 https://replit.com/@RyzhikhRoman/Lab2greedy#main.cpp
+Ссалка на онлайн компилятор(жадный алгоритм):
+https://replit.com/@RyzhikhRoman/Lab2#main.cpp
+
 Пример входных данных:
 a g
 a b 3.0

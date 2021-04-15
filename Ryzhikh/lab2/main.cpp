@@ -158,20 +158,21 @@ vector<char> FindingPath::GreedyAlgorithm() {
         bool found = false;
 
         for (auto& i : this->graph[CurVertex]) {
-            cout << "Рассматривается смежная вершина - " << i.first << endl;
+            //cout << "Рассматривается смежная вершина - " << i.first << endl;
             if (!visited[i.first] && i.second < min) {
-                cout << "Идём в вершину " << i.first << ", т.к. наименьший вес (" << i.second << ") и/или идёт первой\n";
+                cout << "Идём в вершину " << i.first << "(" << i.second << ")\n";
                 min = i.second;
                 NextVertex = i.first;
                 found = true;
         
             }
         }
-        cout << endl;
+        //cout << endl;
         visited[CurVertex] = true;
 
         if (!found) {
             if (!result.empty()) {
+                cout << "Из вершины " << CurVertex << " конечная вершина недостижима, возвращаемся обратно\n";
                 result.pop_back();
                 CurVertex = result.back();
             }
@@ -179,6 +180,7 @@ vector<char> FindingPath::GreedyAlgorithm() {
         }
         CurVertex = NextVertex;
         result.push_back(CurVertex);
+        cout << endl;
     }
     cout << "Конец алгоритма!\n";
     return result;
