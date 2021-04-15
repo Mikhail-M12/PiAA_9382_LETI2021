@@ -39,6 +39,7 @@ int FindingPath::Heuristic(char a, char b) {
 }
 
 vector<char> FindingPath::AStar() {  //А*
+    cout << "\nАлгоритм А*:\n";
     map<char, pair<vector<char>, double>> ShortPathes;  //текущие кратчайшие пути
     vector<char> vertex;
     priority_queue < pair<char, double>, vector<pair<char, double>>, Sorting> PriorityQueue; //очередь в алгоритме
@@ -115,6 +116,7 @@ void FindingPath::Read() {
 
 
 vector<char> FindingPath::GreedyAlgorithm() {
+    cout << "\nЖадный алгоритм:\n";
     double min;
     vector<char> result;
     result.reserve(this->number);
