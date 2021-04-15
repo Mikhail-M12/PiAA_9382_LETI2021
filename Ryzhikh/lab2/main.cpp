@@ -13,6 +13,7 @@ public:
     vector<char> GreedyAlgorithm();
     vector<char> AStar();
     void Sort();
+    void SortAStar();
     void Read();
     int Heuristic(char a, char b);
 
@@ -35,7 +36,7 @@ struct Sorting { //функция сортировки для приоритет
 };
 
 int FindingPath::Heuristic(char a, char b) {
-    return abs(a-b);
+    return abs(a - b);
 }
 
 vector<char> FindingPath::AStar() {  //А*
@@ -50,20 +51,24 @@ vector<char> FindingPath::AStar() {  //А*
 
     while (!PriorityQueue.empty()) {  //пока очередь не пуста
         if (PriorityQueue.top().first == end) {  //если найдена конечная вершина
+            cout << "Найдена конечная вершина!\n";
             return ShortPathes[end].first;  //то заканчивается поиск
         }
 
         auto TmpVertex = PriorityQueue.top();  //достается приоритетная вершина из очереди
+        cout << "Текущая вершина - " << TmpVertex.first << endl;
         PriorityQueue.pop();
 
         for (auto& i : graph[TmpVertex.first]) {  //рассматриваются все вершины, которые соединены с текущей вершиной
+            cout << "   Рассматривается смежная для " << TmpVertex.first << " вершина "<< i.first << endl;
             double CurLength = ShortPathes[TmpVertex.first].second + i.second;
             if (ShortPathes[i.first].second == 0 || ShortPathes[i.first].second > CurLength) { //если пути нет или найденный путь короче
+                cout << "       В путь родительской вершины добавляется текущая вершина " << i.first <<"(" << CurLength << ")"<< endl;
                 vector<char> path = ShortPathes[TmpVertex.first].first;  //добавляется в путь родительской вершины текущая вершина с кратчайшим путем
                 path.push_back(i.first);
                 ShortPathes[i.first] = { path, CurLength };  //обновление пути и расстояния
-                int heur = Heuristic(end, i.first);
-                //cout << i.first << ' ' << heuristic[i.first] << '\n';
+                int heur = Heuristic(TmpVertex.first, i.first);
+                cout << "   Эвристика для вершин " << TmpVertex.first << " и " << i.first << " = " << heur << endl << endl;
                 PriorityQueue.push({ i.first, heur + ShortPathes[i.first].second }); //записывается в очередь текущая вершина 
             }
 
@@ -73,6 +78,28 @@ vector<char> FindingPath::AStar() {  //А*
     return ShortPathes[end].first;
 }
 
+
+void FindingPath::SortAStar() {
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+        cout << "Для вершины " << it->first << " есть следующие смежные вершины:\n";
+        for (int i = 0; i < it->second.size(); i++) {
+            cout << it->second[i].first << '(' << it->second[i].second << ')' << ' ';
+        }
+        cout << endl;
+        std::sort(it->second.begin(), it->second.end(), [](pair<char, double>& a, pair<char, double>& b) -> bool 
+            { 
+                if (a.second == b.second)
+                    return (a.first < b.first);
+                else
+                    return (a.second < b.second); 
+            });
+        cout << "Отсортированные вершины:\n";
+        for (int j = 0; j < it->second.size(); j++) {
+            cout << it->second[j].first << '(' << it->second[j].second << ')' << ' ';
+        }
+        cout << endl;
+    }
+}
 
 
 void FindingPath::Sort() {
@@ -125,18 +152,22 @@ vector<char> FindingPath::GreedyAlgorithm() {
     char CurVertex = this->start;
 
     while (CurVertex != this->end) {
+        cout << "Текущая вершина - " << CurVertex << endl;
         char NextVertex;
         min = 100;
         bool found = false;
 
         for (auto& i : this->graph[CurVertex]) {
+            cout << "Рассматривается смежная вершина - " << i.first << endl;
             if (!visited[i.first] && i.second < min) {
+                cout << "Идём в вершину " << i.first << ", т.к. наименьший вес (" << i.second << ") и/или идёт первой\n";
                 min = i.second;
                 NextVertex = i.first;
                 found = true;
         
             }
         }
+        cout << endl;
         visited[CurVertex] = true;
 
         if (!found) {
@@ -149,7 +180,7 @@ vector<char> FindingPath::GreedyAlgorithm() {
         CurVertex = NextVertex;
         result.push_back(CurVertex);
     }
-
+    cout << "Конец алгоритма!\n";
     return result;
 }
 
@@ -158,7 +189,7 @@ int main() {
     setlocale(LC_ALL, "Russian");
     FindingPath answer;
     answer.Read();
-    answer.Sort();
+    answer.SortAStar();
     vector<char> out = answer.AStar();
     cout << "Ответ:";
     for (auto& i : out) {
