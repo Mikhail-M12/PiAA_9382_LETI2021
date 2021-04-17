@@ -16,20 +16,18 @@ typedef char type;
 // vertex + some number
 typedef std::pair<type, double> path_to;
 // comparator for priority queue
-struct comparator {
-  bool operator()(const path_to &lhs, const path_to &rhs) {
-    return lhs.second < rhs.second;  ///
-  }
-};
+int compare(const void *lhs, const void *rhs) {
+  return ((path_to *)lhs)->second - ((path_to *)rhs)->second;  ///
+}
 
 // edges of one vertex
 typedef std::map<type, double> edges_end;
+// array of neighbours for bfs to sort
+typedef std::vector<path_to> bfs_neighbours;
 // vertex and it's edges
 typedef std::map<type, edges_end> edges_type;
 // stack for current path
 typedef std::vector<type> path_stack;
-// queue with priorities
-typedef std::priority_queue<path_to, std::vector<path_to>, comparator> pr_queue;
 
 class stream_finder {
  private:
@@ -68,11 +66,11 @@ class stream_finder {
       output << vert << "-" << el.first << ": " << el.second << "\n";
   }
 
-  void print_frontier(const pr_queue &f, std::ostream &output) {
-    pr_queue tmp = f;
+  void print_frontier(const std::queue<path_to> &f, std::ostream &output) {
+    std::queue<path_to> tmp = f;
     std::vector<path_to> arr;
     while (!tmp.empty()) {
-      arr.push_back(tmp.top());
+      arr.push_back(tmp.front());//top());
       tmp.pop();
     }
     for (auto &el : arr) output << el.first << ": " << el.second << " ";
@@ -106,10 +104,9 @@ class stream_finder {
   // Find path
   void update_path(std::ostream &output) {
     type cur = start;          // current vertex
-    edges_end cur_pathes;      // edges of current vertex
     bool path_found = false;   // searching end flag
 
-    std::priority_queue<path_to, std::vector<path_to>, comparator> frontier;  // unvisited vertices with edge capacity
+    std::queue<path_to> frontier;  // unvisited vertices with edge capacity
     std::map<type, type> came_from;  // key - vertex, value - previous vertex on path
 
     path.clear();
@@ -119,18 +116,23 @@ class stream_finder {
 
     // search cycle
     while (!path_found) {
+      bfs_neighbours cur_pathes; // edges of current vertex
       output << "\nCurrent vertex: " << cur << "\n";
       // get edges
       if (edges.find(cur) != edges.end()) {
-        cur_pathes = edges.find(cur)->second;
-        print_edges_vert(cur_pathes, cur, output);
+        auto found = edges.find(cur)->second;
+        for (auto &el : found)
+          cur_pathes.push_back(std::make_pair(el.first, el.second));
+        print_edges_vert(found, cur, output);
       } else {
-        cur_pathes = edges_end();
+        cur_pathes = bfs_neighbours();
         output << "No edges\n";
       }
       output << "Current edges: \n";
       auto iter_visited = visited.end();
       int num = (int)cur_pathes.size();
+      // sort neighbours by capacity
+      std::qsort(cur_pathes.data(), num, sizeof(path_to), compare);
       // add all unvisited neighbours to frontier
       for (auto &vert : cur_pathes){
         output << "Checking path " << cur << "-" << vert.first << "\n";
@@ -159,7 +161,7 @@ class stream_finder {
         // get next vertex from frontier
         output << "Frontier:\n";
         print_frontier(frontier, output);
-        cur = frontier.top().first;
+        cur = frontier.front().first;
         frontier.pop();
       }
     }
