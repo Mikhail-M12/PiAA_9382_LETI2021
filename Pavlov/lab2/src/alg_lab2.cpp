@@ -1,7 +1,9 @@
 ﻿// Метка CUSTOM_QUEUE определяет, используется ли
 // std::priority_queue или пользовательский тип PriorQueue
 // OUTPUT включает вывод промежуточной информации
+// AUTO_INPUT убирает лишний вывод при задействовании скрипта
 
+#define AUTO_INPUT
 #define CUSTOM_QUEUE
 //#define OUTPUT
 
@@ -99,10 +101,14 @@ private:
 		std::string main, adj;
 		double weight;
 		// Добавление начальной и конечной вершин
+#ifdef OUTPUT
 		std::cout << "Для остановки ввода вершин нажать Ctrl+Z, затем Enter\n";
 		std::cout << "\nПожалуйста, введите исходную и конечную вершины ( <вершина1> <вершина2>): ";
+#endif
 		std::cin >> sourceName >> destName;
+#ifdef OUTPUT
 		system("cls");
+#endif
 		vertices->push_back(new Vertex(sourceName));
 #ifdef OUTPUT
 		std::cout << "Вершина " << vertices->back()->name << " добавлена в граф\n";
@@ -113,9 +119,13 @@ private:
 #endif
 
 		while (true) {
+#ifdef OUTPUT
 			std::cout << "\nПожалуйста, введите ребро ( <вершина1> <вершина2> <расстояние> ): ";
+#endif
 			std::cin >> main >> adj >> weight;
+#ifdef OUTPUT
 			system("cls");
+#endif
 			if (!std::cin) {
 				break;
 			}
@@ -205,7 +215,6 @@ private:
 
 	// Алгоритм A*
 	std::string aStar() {
-		clock_t beg = clock();
 	// Инициализация очереди и строки с указанием пути
 #ifdef CUSTOM_QUEUE
 		PriorQueue openList = PriorQueue(vertices->at(0));
@@ -264,8 +273,6 @@ private:
 #endif
 		// Запись пути в результирующую строку
 		retrievePath(vertices->at(1), res);
-		clock_t end = clock();
-		std::cout << end - beg<<"\n";
 		return res;
 	}
 public:
@@ -279,6 +286,9 @@ public:
 };
 
 int main() {
+#ifdef AUTO_INPUT
+	Navigator::route();
+#else
 	int command = 0;
 	setlocale(LC_ALL, "Ru");
 	std::cout << "Проложить маршрут? 0 - нет, 1 - да\n";
@@ -293,5 +303,6 @@ int main() {
 	default:
 		std::cout << "Неизвестная команда, выход из программы\n";
 	}
+#endif
 	return 0;
 }
