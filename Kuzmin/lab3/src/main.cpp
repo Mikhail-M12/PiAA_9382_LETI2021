@@ -19,6 +19,10 @@ class Vertex {
 public:
 
     char name;
+    std::vector<Edge*> neighbourEdges;
+    void addNeighbour(Edge* e) {
+        neighbourEdges.push_back(e);
+    }
     Vertex(char name) :name(name) {}
     Vertex() {}
 
@@ -30,7 +34,6 @@ public:
         return v1.name < v2.name;
     }
 };
-
 
 //ребро графа
 class Edge {
@@ -120,7 +123,6 @@ public:
         }
         return nullptr;
     }
-
         //вывод ребер
         void printEdges() {
             std::sort(edgeVector.begin(), edgeVector.end());
@@ -142,9 +144,8 @@ public:
 
             Edge* addedEdge = new Edge(v1, v2, cap);
             if (!isInVector(edgeVector, Edge(v1, v2, cap))) {
-
                 edgeVector.push_back(*addedEdge);
-
+                (*this)(v1)->addNeighbour(addedEdge);
             }
         }
 
@@ -155,15 +156,6 @@ public:
             char verName1;
             char verName2;
             int capacity;
-#ifdef FILEINPUT
-            std::cout << "Ввод:\n";
-
-            while (std::getline(file, tmp)) {
-                std::cout << tmp << "\n";
-            }
-            std::cout << "\n";
-            file.close();
-#endif
 
             //считывание списка ребер
             int n;
@@ -190,125 +182,128 @@ public:
         }
     };
 
-    Edge findMaxCapacityEdge(Graph graph, Vertex v1, std::vector<Vertex> blocked) {
+
+    Edge findMaxCapacityEdge(std::vector<Edge> vec, std::vector<Edge> blocked) {
 
         //ребро, которое возвращается, если пути нет
         Edge max = Edge('_', '-', -200);
-        bool reverse = false;
 
-        //лямбда функция проверки, подходит ли ребро для продолжения пути
-        auto lambda = [&](Edge it, bool reverse) {
-            bool found = false;
+        for (const auto& it: vec) {
 #ifdef INFO
-            if (it.v1 == v1) {
-                std::cout << "Вершина " << it.v2.name << " дуга ";
-                if (reverse) std::cout << "\"обратная\" ";
-                std::cout << it;
-            }
+                std::cout << "Дуга ";
+                if (it.isReverse) std::cout << "\"обратная\" ";
+                std::cout << it;          
 #endif
-            if (it.v1 == v1 && max.capacity < it.capacity && it.capacity > 0) {
+            if (max.capacity < it.capacity && it.capacity > 0){
 
-                bool has = isInVector(blocked, it.v2); //если вершина не содержится среди посещенных
+                //если ребро не содержится среди посещенных
+                bool has = isInVector(blocked, it); 
                 if (!has) {
                     max = it;
-                    max.isReverse = reverse;
                 }
                 else {
 #ifdef INFO 
-                    std::cout << "(уже посещена)";
+                    std::cout << "(уже обработана)";
 #endif      
                 }
             }
 #ifdef INFO
-            if (it.v1 == v1) std::cout << "\n";
+            std::cout << "\n";
 #endif
         };
         //-------
-
-        //проверка для обычных ребер
-        for (const auto& it : graph.edgeVector) {
-            lambda(it, 0);
-        }
-
-        //для "обратных"
-        for (const auto& it : graph.edgeVector) {
-            auto it2 = *graph(it.v1.name, it.v2.name)->reverseEdge;
-            lambda(it2, 1);
-        }
         return max;
     }
-    std::vector<Edge> findPath(Graph graph) {
-
+    
+    std::deque<Edge> findPath(Graph graph){
 
         std::vector<Edge> path;
-        std::vector<Vertex> block;
-        std::vector<Vertex> pathV;
-        pathV.push_back(*graph(graph.root));
-
-#ifdef INFO
-        std::cout << "\n\nПоиск пути \n";
-#endif
-        Vertex current = *graph(graph.root);
-
-        //основной цикл
-        while (!pathV.empty()) {
-
-#ifdef INFO
-            std::cout << "\nСоседи вершины " << current.name << ":\n";
-
-#endif
-            //нахождение макисмальной дуги
-            Edge nextEdge = findMaxCapacityEdge(graph, current, block);
-
-            //если нашлась продолжение пути
-            if (nextEdge.capacity != -200) {
-#ifdef INFO
-                std::cout << "Переход по дуге " << nextEdge << "\n";
-#endif
-                current = *graph(nextEdge.v2.name);
-                path.push_back(nextEdge);
-                pathV.push_back(current);
-                if (nextEdge.v2.name == graph.goal) break;
-                block.push_back(current);
-            }
-            //если нет, возвращение к последней посещенной вершине
-            else {
-#ifdef INFO
-                std::cout << "Нет доступных путей из вершины " << current.name << "\nВозврат к предыдущей вершине\n";
-#endif
-                block.push_back(pathV.back());
-                pathV.pop_back();
-
-                if (!path.empty()) path.pop_back();
-
-                if (pathV.empty()) {
-#ifdef INFO
-                    std::cout << "\nПути не существует\nЗавершение алгоритма\n\n";
-#endif
-                    return path;
-                }
-                else current = *graph(pathV.back().name); //когда ребер в пути нет, но есть одна вершина - начальная
-            }
-            //----------
+        std::vector<Edge> reserve;
+        std::vector<Edge> blocked;
+        for (const auto& it : graph(graph.root)->neighbourEdges){
+            if (!isInVector(reserve, *it))
+            reserve.push_back(*graph(it->v1.name, it->v2.name));
         }
-
-        //вывод
+        while (1){
 #ifdef INFO
-        std::cout << "\nНайденный путь: ";
-        for (auto it : pathV)
-            std::cout << it.name;
-        std::cout << "\n";
-#endif
+            std::cout << "\nСписок возможных дуг для построения пути\n";
+#endif 
+            //берется дуга с максимальной пропускной способностью
+            Edge nxt = findMaxCapacityEdge(reserve, blocked);
 
-        return path;
+   
+            //если путь найти не удается
+            if (nxt.capacity == -200){        
+#ifdef INFO
+                    std::cout << "\nНет доступных путей. Завeршение алгоритма\n";
+#endif
+                    return std::deque<Edge>();
+            }
+            else{
+#ifdef INFO
+                std::cout << "\nВыбранная дуга - " << nxt << "\n";
+#endif
+                //восстановление пути, если вновь взятая дуга ведет к конечной вершине
+                if (nxt.v2 == graph.goal) {
+                    std::deque<Edge> actualPath;
+                    actualPath.push_front(nxt);
+                    Edge previous;
+                    while (nxt.v1.name != graph.root) {
+                        for (auto it : path) {
+                            if (it.v2 == nxt.v1) {
+                                previous = it;
+                                break;
+                            }
+                        }
+                        nxt = previous;
+                        actualPath.push_front(nxt);
+                    }
+
+
+#ifdef INFO
+                    std::cout << "\nНайденный путь:";
+                    std::cout << actualPath[0].v1.name;
+                    for (auto it : actualPath)
+                        std::cout << it.v2.name;
+                    std::cout << "\n";
+#endif
+                    return actualPath;
+                }
+                //-------
+
+                //добавление найденной дуги в список заблокированных и список пути
+                blocked.push_back(nxt);
+                path.push_back(nxt);
+
+                //добавление соседей и их обратные дуги в список возможных для продолжения пути
+                for (auto it : graph(nxt.v2.name)->neighbourEdges){ 
+                    if (!isInVector(reserve, *it) && !isInVector(blocked, *it)){
+                    it = graph(nxt.v2.name, it->v2.name);
+                    reserve.push_back(*graph(it->v1.name, it->v2.name));
+                    for (auto itr : graph.edgeVector){
+                        Edge r = *itr.reverseEdge;
+                        if (r.v1 == it->v1 && !isInVector(reserve, r)){
+                            reserve.push_back(r);
+                            reserve.back().isReverse = true;
+#ifdef INFO
+                            std::cout << "\"Обратная\" дуга " << r << " добавлена в список возможных дуг\n";
+#endif
+                        }
+                    }
+#ifdef INFO
+                    std::cout <<"Дуга " << *it << " добавлена в список возможных дуг\n";
+#endif
+                    }
+                }
+            }
+        }
     }
 
-    void findMaxFlow(Graph graph) {
-
+void findMaxFlow(Graph graph) {
         Graph rGraph(graph); //остаточная сеть
         int maxflow = 0;
         Edge* currEdge;
-        std::vector<Edge> currentPath = findPath(rGraph);
+        std::deque<Edge> currentPath = findPath(rGraph);
 
         while (currentPath.size() != 0) {
             int min = currentPath.front().capacity;
@@ -319,11 +314,12 @@ public:
                 min = (tmpCap < min) ? tmpCap : min;
             }
             //------
+
 #ifdef INFO
             std::cout << "Минимальная пропускная спосбность: " << min << "\n";
 #endif
             //обновление потоков и пропускных спобностей ребер, участвуюших в пути
-            for (auto pathEdge : currentPath) {
+            for (const auto&  pathEdge : currentPath) {
 
                 //если ребро в пути не является обратным
                 currEdge = rGraph(pathEdge.v1.name, pathEdge.v2.name);
@@ -352,22 +348,20 @@ public:
 
                 if (reverseOfCurr != nullptr) {
                     reverseOfCurr->reverseEdge = currEdge;
-                    currEdge->reverseEdge = reverseOfCurr;
+                    currEdge->reverseEdge = reverseOfCurr;      
                 }
-
                 currEdge->reverseEdge->flow -= min;
                 currEdge->reverseEdge->capacity += min;
             }
             maxflow += min;
             currentPath = findPath(rGraph);
         }
-
         std::cout << maxflow << "\n";
         rGraph.printEdges();
     }
 
-    int main()
-    {
+    int main(){
+
         Graph graph;
         setlocale(LC_ALL, "rus");
         bool input = graph.input();
@@ -375,7 +369,9 @@ public:
             std::cout << "Некорректный ввод\n";
             exit(-1);
         }
-        std::cout << "\nПоиск максимального потока. "<<graph.root << " - источник, " << graph.goal << " - сток";
+#ifdef INFO
+        std::cout << "\nПоиск максимального потока. "<<graph.root << " - источник, " << graph.goal << " - сток\n";
+#endif
         findMaxFlow(graph);
         return 0;
     }
