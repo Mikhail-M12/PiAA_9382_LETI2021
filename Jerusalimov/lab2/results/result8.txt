@@ -1,0 +1,141 @@
+enable Intermediate data? 1 - Yes 0 - No
+Gready Algoritm - 0, Astar - 1, Dijkstra - 2
+Input data with ')' on end: 
+Using Dijkstra algorithm
+______________________________________
+	Calculate the summ of path for each neighbor
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { a, 0} )
+	We took the vertices out of the queue{ a, 0} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'a'
+		__________________________a -> b__________________________
+			calculate the sum for 'b', summ = current + next = 0 + 3 = 3
+			The new sum of paths for 'b' = 3 
+			Add in queue 'b'. ({ b, 3} )
+
+			Add prev vertex in parent a<-
+		__________________________a -> c__________________________
+			calculate the sum for 'c', summ = current + next = 0 + 1 = 1
+			The new sum of paths for 'c' = 1 
+			Add in queue 'c'. ({ c, 1}{ b, 3} )
+
+			Add prev vertex in parent a<-
+		__________________________a -> g__________________________
+			calculate the sum for 'g', summ = current + next = 0 + 8 = 8
+			The new sum of paths for 'g' = 8 
+			Add in queue 'g'. ({ c, 1}{ b, 3}{ g, 8} )
+
+			Add prev vertex in parent 
+
+				a != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { c, 1}{ b, 3}{ g, 8} )
+	We took the vertices out of the queue{ c, 1} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'c'
+		__________________________c -> m__________________________
+			calculate the sum for 'm', summ = current + next = 1 + 1 = 2
+			The new sum of paths for 'm' = 2 
+			Add in queue 'm'. ({ m, 2}{ b, 3}{ g, 8} )
+
+			Add prev vertex in parent c<-a<-
+
+				c != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { m, 2}{ b, 3}{ g, 8} )
+	We took the vertices out of the queue{ m, 2} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'm'
+		__________________________m -> n__________________________
+			calculate the sum for 'n', summ = current + next = 2 + 1 = 3
+			The new sum of paths for 'n' = 3 
+			Add in queue 'n'. ({ b, 3}{ n, 3}{ g, 8} )
+
+			Add prev vertex in parent m<-c<-a<-
+
+				m != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { b, 3}{ n, 3}{ g, 8} )
+	We took the vertices out of the queue{ b, 3} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'b'
+		__________________________b -> d__________________________
+			calculate the sum for 'd', summ = current + next = 3 + 2 = 5
+			The new sum of paths for 'd' = 5 
+			Add in queue 'd'. ({ n, 3}{ d, 5}{ g, 8} )
+
+			Add prev vertex in parent b<-a<-
+		__________________________b -> e__________________________
+			calculate the sum for 'e', summ = current + next = 3 + 3 = 6
+			The new sum of paths for 'e' = 6 
+			Add in queue 'e'. ({ n, 3}{ d, 5}{ e, 6}{ g, 8} )
+
+			Add prev vertex in parent b<-a<-
+
+				b != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { n, 3}{ d, 5}{ e, 6}{ g, 8} )
+	We took the vertices out of the queue{ n, 3} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'n'
+Vertex 'n' has no neighbors
+Take the next item in the queue
+
+
+				n != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { d, 5}{ e, 6}{ g, 8} )
+	We took the vertices out of the queue{ d, 5} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'd'
+		__________________________d -> e__________________________
+			calculate the sum for 'e', summ = current + next = 5 + 4 = 9
+			Sum of top 'e' is better than new. 6 < 9, go next.
+
+				d != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { e, 6}{ g, 8} )
+	We took the vertices out of the queue{ e, 6} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'e'
+		__________________________e -> a__________________________
+			calculate the sum for 'a', summ = current + next = 6 + 3 = 9
+			The new sum of paths for 'a' = 9 
+			Add in queue 'a'. ({ g, 8}{ a, 9} )
+
+			Add prev vertex in parent 
+		__________________________e -> f__________________________
+			calculate the sum for 'f', summ = current + next = 6 + 2 = 8
+			The new sum of paths for 'f' = 8 
+			Add in queue 'f'. ({ g, 8}{ f, 8}{ a, 9} )
+
+			Add prev vertex in parent e<-b<-a<-
+
+				e != g
+ 				Continue...
+
+//////////////////////////////////////////////////////////////
+
+	Current queue ( { g, 8}{ f, 8}{ a, 9} )
+	We took the vertices out of the queue{ g, 8} and put it in a temporary variable
+	We go through all the neighbors of the vertex  'g'
+
+				g = g
+ 				End
+
+a->g
+Answer is :a->g
