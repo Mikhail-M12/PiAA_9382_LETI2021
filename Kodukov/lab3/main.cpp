@@ -66,14 +66,14 @@ class stream_finder {
       output << vert << "-" << el.first << ": " << el.second << "\n";
   }
 
-  void print_frontier(const std::queue<path_to> &f, std::ostream &output) {
-    std::queue<path_to> tmp = f;
-    std::vector<path_to> arr;
+  void print_frontier(const std::queue<type> &f, std::ostream &output) {
+    std::queue<type> tmp = f;
+    std::vector<type> arr;
     while (!tmp.empty()) {
       arr.push_back(tmp.front());//top());
       tmp.pop();
     }
-    for (auto &el : arr) output << el.first << ": " << el.second << " ";
+    for (auto &el : arr) output << el;// << ": " << el.second << " ";
     output << "\n";
   }
 
@@ -100,20 +100,31 @@ class stream_finder {
       for (auto &b : a.second)
         output << a.first << " " << b.first << " " << b.second << "\n";
   }
-  
+
+  bool in_new_front(const std::queue<type> &nf, type v) { 
+    auto tmp = nf;
+    while (!tmp.empty()) {
+      type cur = tmp.front();
+      tmp.pop();
+      if (cur == v)
+        return true;
+    }
+    return false;
+  }
+
   // Find path
   void update_path(std::ostream &output) {
     type cur = start;          // current vertex
     bool path_found = false;   // searching end flag
 
-    std::queue<path_to> frontier;  // unvisited vertices with edge capacity
+    std::queue<type> frontier, new_frontier; // unvisited vertices with edge capacity
     std::map<type, type> came_from;  // key - vertex, value - previous vertex on path
 
     path.clear();
     visited.clear();
 
     output << "\n\nBegin path finding...\n\n";
-
+    visited.emplace(start);
     // search cycle
     while (!path_found) {
       bfs_neighbours cur_pathes; // edges of current vertex
@@ -132,15 +143,17 @@ class stream_finder {
       auto iter_visited = visited.end();
       int num = (int)cur_pathes.size();
       // sort neighbours by capacity
-      std::qsort(cur_pathes.data(), num, sizeof(path_to), compare);
+      //std::qsort(cur_pathes.data(), num, sizeof(path_to), compare);
       // add all unvisited neighbours to frontier
       for (auto &vert : cur_pathes){
         output << "Checking path " << cur << "-" << vert.first << "\n";
-        // check if capacity of edge > 0 and it wasnt visited
-        if (vert.second > 0 && (visited.find(vert.first) == visited.end())){
+        // check if capacity of edge > 0 and it wasnt visited or new edge has
+        if (vert.second > 0 && (visited.find(vert.first) == visited.end()) && 
+             (!in_new_front(new_frontier, vert.first) || edges[came_from[vert.first]][vert.first] < vert.second)){
           output << "  It wasn't visited earlier and capacity > 0, add to frontier\n";
           // add to frontier
-          frontier.push(vert);
+          if (!in_new_front(new_frontier, vert.first))
+            new_frontier.push(vert.first);///
           came_from[vert.first] = cur;
           // check if path found
           if (vert.first == end) {
@@ -148,20 +161,33 @@ class stream_finder {
             path_found = true;
             break;
           }
-          visited.emplace(vert.first);
+          ///visited.emplace(vert.first);
         } else {
           output << "  It was visited earlier or capacity == 0\n";
         }
       }
+      ///visited.emplace(cur);///
       if (!path_found) {
-        if (frontier.empty()) {
+        if (new_frontier.empty() && frontier.empty()) {
           output << "No more pathes\n";
           break;
+        }
+        // go to next frontier if old ends and make it visited
+        if (frontier.empty()) {
+          auto tmp = new_frontier;
+          while (!tmp.empty()) {
+            type v = tmp.front();
+            tmp.pop();
+            visited.emplace(v);
+          }
+          frontier = new_frontier;
+          while (!new_frontier.empty()) 
+            new_frontier.pop();
         }
         // get next vertex from frontier
         output << "Frontier:\n";
         print_frontier(frontier, output);
-        cur = frontier.front().first;
+        cur = frontier.front();
         frontier.pop();
       }
     }
