@@ -15,11 +15,6 @@ typedef char type;
 
 // vertex + some number
 typedef std::pair<type, double> path_to;
-// comparator for priority queue
-int compare(const void *lhs, const void *rhs) {
-  return ((path_to *)lhs)->second - ((path_to *)rhs)->second;  ///
-}
-
 // edges of one vertex
 typedef std::map<type, double> edges_end;
 // array of neighbours for bfs to sort
@@ -142,8 +137,6 @@ class stream_finder {
       output << "Current edges: \n";
       auto iter_visited = visited.end();
       int num = (int)cur_pathes.size();
-      // sort neighbours by capacity
-      //std::qsort(cur_pathes.data(), num, sizeof(path_to), compare);
       // add all unvisited neighbours to frontier
       for (auto &vert : cur_pathes){
         output << "Checking path " << cur << "-" << vert.first << "\n";
@@ -153,20 +146,13 @@ class stream_finder {
           output << "  It wasn't visited earlier and capacity > 0, add to frontier\n";
           // add to frontier
           if (!in_new_front(new_frontier, vert.first))
-            new_frontier.push(vert.first);///
+            new_frontier.push(vert.first);
           came_from[vert.first] = cur;
-          // check if path found
-          if (vert.first == end) {
-            output << "Current vertex is finish, path was found!\n";
-            path_found = true;
-            break;
-          }
-          ///visited.emplace(vert.first);
+          ///
         } else {
           output << "  It was visited earlier or capacity == 0\n";
         }
       }
-      ///visited.emplace(cur);///
       if (!path_found) {
         if (new_frontier.empty() && frontier.empty()) {
           output << "No more pathes\n";
@@ -177,6 +163,12 @@ class stream_finder {
           auto tmp = new_frontier;
           while (!tmp.empty()) {
             type v = tmp.front();
+            // check if path found
+            if (v == end) {//vert.first
+              output << "Current vertex is finish, path was found!\n";
+              path_found = true;
+              break;
+            }
             tmp.pop();
             visited.emplace(v);
           }
