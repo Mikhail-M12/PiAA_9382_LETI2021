@@ -1,0 +1,8 @@
+для запуска программы нужно файл lab4_1.cpp перенести в онлайн-компилятор:
+https://replit.com/@SonKhwa/PossibleMediumblueMarkuplanguage#main.cpp
+и файл test1.txt перенести в онлайн компилятор
+проверено в степике.
+для запуска программы нужно файл lab4_2.cpp перенести в онлайн-компилятор:
+https://replit.com/@SonKhwa/EuphoricCluelessDebugger#main.cpp
+и файл test1.txt перенести в онлайн компилятор
+проверено в степике.
