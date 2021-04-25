@@ -1,0 +1,8 @@
+enable Intermediate data? 1 - Yes 0 - No
+11
+a b 1
+a d 9
+a e 1
+b c 1
+c d 1
+e d 1

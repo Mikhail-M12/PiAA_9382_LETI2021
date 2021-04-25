@@ -1,0 +1,13 @@
+0
+9
+a
+g
+a b 30
+a c 1
+b d 200
+b e 3
+d e 40
+e a 3
+e f 20
+a g 800
+f g 10
