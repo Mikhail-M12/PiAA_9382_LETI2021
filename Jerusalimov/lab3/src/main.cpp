@@ -223,5 +223,6 @@ int main() {
         cout << "\n____________Fulkerson___________________\n";
     }
     g.fulkerson();
+    system("pause>nul");
     return 0;
 }
