@@ -1,7 +1,16 @@
-Ссылка на онлайн компилятор(алгоритм А*):
-https://replit.com/@RyzhikhRoman/Lab2greedy#main.cpp
 Ссалка на онлайн компилятор(жадный алгоритм):
-https://replit.com/@RyzhikhRoman/Lab2#main.cpp
+https://replit.com/@RyzhikhRoman/GreedyAlghotim#main.cpp
+--------------------------
+Ссылка на онлайн компилятор(алгоритм А*):
+https://replit.com/@RyzhikhRoman/AlghotimAStar#main.cpp
+--------------------------
+Ссылка на код, который необходимо проверять на Stepik(алгоритм А*):
+https://replit.com/@RyzhikhRoman/Stepik#main.cpp
+
+В нём закоммичен define, выводящий всю отладочную информацию
+для того, чтобы не приходилось собственноручно коммитить каждый
+cout.
+--------------------------
 
 Пример входных данных:
 a g
