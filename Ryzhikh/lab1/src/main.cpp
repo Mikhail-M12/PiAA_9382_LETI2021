@@ -1,12 +1,15 @@
 #include <iostream>
 #include <vector>
 
+//#define INFO
+
 
 class Lab1
 {
 public:
     int N;
     int minCounter;
+    //int depth = 0;
     std::vector<std::pair<int, std::pair<int, int>>> resArr;
 
     void printAnswer(int scale = 1)
@@ -71,6 +74,11 @@ public:
 
     void chooseBlock(std::vector<std::vector<bool>>& mainArr, std::vector<std::pair<int, std::pair<int, int>>>& tmpArr, int counter, int x, int y)
     {
+        #ifdef INFO
+        //for (int i = 0; i < depth; i++)
+        //    std::cout << "  ";
+        std::cout << "Поиск квадрата для вставки...\n";
+        #endif
         std::pair<int, int> coord = findEmpty(mainArr);
         if (coord.first == -1)
         {
@@ -79,6 +87,11 @@ public:
                 resArr = tmpArr;
                 minCounter = tmpArr.size();
             }
+            #ifdef INFO
+            //for (int i = 0; i < depth; i++)
+            //    std::cout << "  ";
+            std::cout << "  Столешница закончилась!\n\n";
+            #endif
             return;
         }
         if (counter + 1 >= minCounter)
@@ -90,10 +103,20 @@ public:
         std::pair<int, bool> maxSize = findMaxSize(mainArr, coord.first, coord.second); //поиск максимального размера блока для вставки на найденное пустое место
         if (maxSize.second)                                                        //Если можно вставить сразу блок максимального размера
         {
+            #ifdef INFO
+            //for (int i = 0; i < depth; i++)
+            //    std::cout << "  ";
+            std::cout << "  Вставляем квадрат размера " << maxSize.first << " по координатам (" << coord.first+1 << ',' << coord.second+1 << ")\n\n";
+            #endif
             tmpArr.push_back(make_pair(maxSize.first, coord));
             insertBlock(mainArr, maxSize.first, coord.first, coord.second);
+            //depth++;
             chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
             removeBlock(mainArr, maxSize.first, coord.first, coord.second);
+            #ifdef INFO
+            std::cout << "  Удаляем квадрат размера " << maxSize.first << " по координатам (" << coord.first + 1 << ',' << coord.second + 1 << ")\n";
+            #endif
+            //depth--;
             tmpArr.pop_back();
         }
         else
@@ -102,10 +125,20 @@ public:
             {
                 if (tmpBestCounter > minCounter && i == 1)
                     continue;
+                #ifdef INFO
+                //for (int i = 0; i < depth; i++)
+                //    std::cout << "  ";
+                std::cout << "  Вставляем квадрат размера " << i << " по координатам (" << coord.first+1 << ',' << coord.second+1 << ")\n\n";
+                #endif
                 tmpArr.push_back(make_pair(i, coord));
                 insertBlock(mainArr, i, coord.first, coord.second);
+                //depth++;
                 chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
                 removeBlock(mainArr, i, coord.first, coord.second);
+                #ifdef INFO
+                std::cout << "  Удаляем квадрат размера " << i << " по координатам (" << coord.first + 1 << ',' << coord.second + 1 << ")\n";
+                #endif
+                //depth--;
                 tmpArr.pop_back();
             }
         }
@@ -113,6 +146,12 @@ public:
 
     void primeNumber(std::vector<std::vector<bool>>& mainArr) //вставка начальных блоков и начало работы бэктрекинга
     {
+        #ifdef INFO
+        std::cout << "Заполнение столешницы можно начать со вставки 3-х квадратов.\n";
+        std::cout << "Делается это для сокращения времени работы алгоритма.\n";
+        std::cout << "Вставляем квадрат размера "<< N/2+1 << " на координаты (1,1)\n";
+        std::cout << "и 2 других квадрата размера " << N/2 << " на координаты (" << N/2+2 << ",1) и (1," << N/2+2 << ").\n\n";
+        #endif
         insertBlock(mainArr, N / 2 + 1, 0, 0);
         insertBlock(mainArr, N / 2, N / 2 + 1, 0);
         insertBlock(mainArr, N / 2, 0, N / 2 + 1);
@@ -127,6 +166,11 @@ public:
 
     void division2()
     {
+        #ifdef INFO
+        std::cout << "Тривиальный случай, когда размер квадрата - чётный.\n";
+        std::cout << "Минимальное количество квадратов всегда будет 4, а\n";
+        std::cout << "их расположение - по углам столешницы.\n";
+        #endif
         if (N % 2 == 0)
         {
             int N_div = N / 2;
@@ -159,6 +203,7 @@ public:
 
 int main()
 {
+    setlocale(LC_ALL, "Russian");
     Lab1 a;
     std::cin >> a.N;
     a.minCounter = a.N * a.N;
