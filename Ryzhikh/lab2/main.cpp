@@ -3,6 +3,7 @@
 #include <map>
 #include <queue>
 #include <algorithm>
+
 using namespace std;
 
 #define INFO
@@ -30,8 +31,8 @@ public:
 private:
     map<char, vector<pair<char, double>>> graph;
     map<char, bool> visited;
-    char start;
     char end;
+    char start;
     int number;
 };
 
@@ -106,7 +107,7 @@ vector<char> FindingPath::AStar() {  //А*
             //}
             if (ShortPathes[i.first].second == 0 || ShortPathes[i.first].second > CurLength) { //если пути нет или найденный путь короче
                 #ifdef INFO
-                cout << "       В путь родительской вершины добавляется текущая вершина " << i.first <<"(" << CurLength << ")"<< endl;
+                cout << "       В путь родительской вершины добавляется вершина " << i.first <<"(" << ShortPathes[TmpVertex.first].second << " + " << i.second << ")"<< endl;
                 #endif
                 vector<char> path = ShortPathes[TmpVertex.first].first;  //добавляется в путь родительской вершины текущая вершина с кратчайшим путем
                 path.push_back(i.first);
@@ -137,17 +138,14 @@ void FindingPath::SortAStar() {
         }
         cout << endl;
         #endif
-        std::sort(it->second.begin(), it->second.end(), [](pair<char, double>& a, pair<char, double>& b) -> bool 
-            { 
-                if (a.second == b.second)
-                    return (a.first < b.first);
-                else
-                    return (a.second < b.second); 
+        sort(it->second.begin(), it->second.end(), [](pair<char, double>& a, pair<char, double>& b) -> bool
+            {
+                return (- a.first + a.second < - b.first + b.second);
             });
         #ifdef INFO
-        cout << "Отсортированные вершины:\n";
+        cout << "Отсортированные вершины по приоритету:\n";
         for (int j = 0; j < it->second.size(); j++) {
-            cout << it->second[j].first << '(' << it->second[j].second << ')' << ' ';
+            cout << it->second[j].first << '(' << double(end) - it->second[j].first + it->second[j].second << ')' << ' ';
         }
         cout << endl;
         #endif
@@ -264,8 +262,8 @@ int main() {
     setlocale(LC_ALL, "Russian");
     FindingPath answer;
     answer.Read();
-    answer.Sort();
-    vector<char> out = answer.GreedyAlgorithm();
+    answer.SortAStar();
+    vector<char> out = answer.AStar();
     #ifdef INFO
     cout << "Ответ:";
     #endif
