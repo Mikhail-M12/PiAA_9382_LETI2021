@@ -278,7 +278,7 @@ bool cmp(Vertex *a, Vertex *b)
     {
         return a->name > b->name;
     }
-    return (a->f < b->f);
+    return a->f < b->f;
 }
 
 bool aStar(char start, char end, std::vector<Vertex *> &vertices)
