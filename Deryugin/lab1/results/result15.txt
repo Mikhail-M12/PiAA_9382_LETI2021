@@ -1,0 +1,9 @@
+k % 3 == 0 => min count of square = 3 and side of the largest square = k / 3 * 2
+6
+11 11 5
+11 6 5
+11 1 5
+6 11 5
+1 11 5
+1 1 10
+Count of operation with side square equal 15 - 450

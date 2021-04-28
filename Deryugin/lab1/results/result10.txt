@@ -1,0 +1,7 @@
+k % 2 == 0 => min count of square = 4 and side of this squares = k / 2
+4
+6 6 5
+6 1 5
+1 6 5
+1 1 5
+Count of operation with side square equal 10 - 200
