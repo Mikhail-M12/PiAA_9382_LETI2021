@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <Windows.h>
 
 //#define INFO
-
+#define FIELD
 
 class Lab1
 {
@@ -11,6 +12,23 @@ public:
     int minCounter;
     //int depth = 0;
     std::vector<std::pair<int, std::pair<int, int>>> resArr;
+
+    void printField(std::vector<std::vector<bool>>& mainArr)
+    {
+        system("cls");
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < N; j++)
+            {
+                if (mainArr[i][j])
+                    std::cout << "1 ";
+                else
+                    std::cout << "0 ";
+            }
+            std::cout << std::endl;
+        }
+        Sleep(500);
+    }
 
     void printAnswer(int scale = 1)
     {
@@ -74,6 +92,9 @@ public:
 
     void chooseBlock(std::vector<std::vector<bool>>& mainArr, std::vector<std::pair<int, std::pair<int, int>>>& tmpArr, int counter, int x, int y)
     {
+        #ifdef FIELD
+        printField(mainArr);
+        #endif
         #ifdef INFO
         //for (int i = 0; i < depth; i++)
         //    std::cout << "  ";
@@ -110,9 +131,11 @@ public:
             #endif
             tmpArr.push_back(make_pair(maxSize.first, coord));
             insertBlock(mainArr, maxSize.first, coord.first, coord.second);
-            //depth++;
             chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
             removeBlock(mainArr, maxSize.first, coord.first, coord.second);
+            #ifdef FIELD
+            printField(mainArr);
+            #endif
             #ifdef INFO
             std::cout << "  Удаляем квадрат размера " << maxSize.first << " по координатам (" << coord.first + 1 << ',' << coord.second + 1 << ")\n";
             #endif
@@ -132,13 +155,14 @@ public:
                 #endif
                 tmpArr.push_back(make_pair(i, coord));
                 insertBlock(mainArr, i, coord.first, coord.second);
-                //depth++;
                 chooseBlock(mainArr, tmpArr, counter + 1, x, y); //вставляем очередной блок
                 removeBlock(mainArr, i, coord.first, coord.second);
+                #ifdef FIELD
+                printField(mainArr);
+                #endif
                 #ifdef INFO
                 std::cout << "  Удаляем квадрат размера " << i << " по координатам (" << coord.first + 1 << ',' << coord.second + 1 << ")\n";
                 #endif
-                //depth--;
                 tmpArr.pop_back();
             }
         }
