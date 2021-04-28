@@ -1,0 +1,4 @@
+Онлайн компилятор.
+https://replit.com/@lastrise/F-FPiAA3#main.py
+
+Входные данные в формате тех, что представлены на Stepik.
