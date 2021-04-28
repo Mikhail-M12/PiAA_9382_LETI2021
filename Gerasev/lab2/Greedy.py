@@ -64,12 +64,7 @@ class Graph:
         pylabShow()
 
 
-def inputHandler():
-    inputList = []
-    line = input()
-    while line:
-        inputList.append(line.strip())
-        line = input()
+def inputHandler(inputList):
     graph = Graph()
 
     for i in range(len(inputList)):
@@ -83,15 +78,20 @@ def inputHandler():
     return (graph, start, end)
 
 if __name__ == '__main__':
-    proccesedInput = inputHandler()
-    graph = proccesedInput[0]
-    start = proccesedInput[1]
-    end = proccesedInput[2]
+    inp = list(iter(input, ''))
+    numberOfLines = int(inp[0])
+    print('Number of tests is', numberOfLines, '\n')
+    for i in range(numberOfLines):
+        inputList = list(iter(input, ''))
+        print(inputList)
+        proccesedInput = inputHandler(inputList)
+        graph = proccesedInput[0]
+        start = proccesedInput[1]
+        end = proccesedInput[2]
 
-    ans = graph.greedy(start, end)
+        ans = graph.greedy(start, end)
 
-    graph.draw()
-    print("\nAnswer: ", end='')
-    for i in ans:
-        print(i, end='')
-    print()
+        print("\nAnswer: ", end='')
+        for i in ans:
+            print(i, end='')
+        print('\n\n\n')

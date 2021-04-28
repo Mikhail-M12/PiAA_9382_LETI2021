@@ -1,6 +1,28 @@
+3
+
 a e
 a b 3.0
 b c 1.0
 c d 1.0
 a d 5.0
 d e 1.0
+
+a j
+a b 1
+b c 1
+c d 1
+d e 1
+e j 1
+a f 1
+f g 1
+g h 1
+h i 1
+i j 1
+
+a z
+a w 2.0
+a b 1.0
+b y 1.0
+y z 1.0
+w z 3.0
+
