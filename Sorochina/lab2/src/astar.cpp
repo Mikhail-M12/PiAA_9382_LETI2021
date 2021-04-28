@@ -19,7 +19,7 @@ struct Vertex
 //функции
 void input(char &start, char &end1, char &end2, std::vector<Vertex *> &);
 //функция считываящая ввод
-double h(char start, char end1, char end2);
+double h(char start, char end);
 //эвристическая фукнция оценки расстояния между вершинами
 void fAdj(char end, std::vector<Vertex *> &open, Vertex *curr, std::vector<Vertex *> vertices);
 //функция поиска вершины с мин. f
@@ -187,51 +187,53 @@ void fAdj(char end, std::vector<Vertex *> &open, Vertex *curr, std::vector<Verte
             std::cout << '\n';
 #endif
             neighbour = retVer(ver.first, vertices);
-            if (neighbour->seen != 1)
+
+            newG = curr->g + ver.second;
+            newF = curr->g + ver.second + h(ver.first, end);
+            if (neighbour->seen == 1 && newG >= neighbour->g)
             {
-                newG = curr->g + ver.second;
-                newF = curr->g + ver.second + h(ver.first, end);
-                if (!isIn(neighbour, open) || newF < neighbour->f)
-                {
-                    neighbour->prev = curr;
-                    neighbour->g = newG;
-                    neighbour->f = newF;
-                }
-                if (newF < neighbour->f)
-                {
+                continue;
+            }
+            if (!isIn(neighbour, open) || newG < neighbour->g)
+            {
+                neighbour->prev = curr;
+                neighbour->g = newG;
+                neighbour->f = newF;
+            }
+            if (newG < neighbour->g)
+            {
 #ifdef COMMENTS
-                    std::cout << "Новая f меньше старой, перезаписываем\n";
-#endif
-                }
-                if (!isIn(neighbour, open))
-                {
-#ifdef COMMENTS
-                    std::cout << "Добавляем вершину [" << ver.first << "] в open\n";
-#endif
-                    open.push_back(neighbour);
-                }
-
-                newF = curr->f + ver.second + h(neighbour->name, end);
-#ifdef COMMENTS
-                std::cout << "Новая f для [" << ver.first << "] равна " << newF << "\n";
-#endif
-                if (newF < neighbour->f)
-                {
-#ifdef COMMENTS
-                    std::cout << "Новая f (" << newF << ") для [" << ver.first << "] меньше старой (" << neighbour->f << "). Обновление.\n";
-#endif
-
-                    neighbour->g += ver.second;
-                    neighbour->f = neighbour->g + h(ver.first, end);
-                    neighbour->prev = curr;
-                }
-#ifdef COMMENTS
-                else
-                {
-                    std::cout << "Новая f не лучше старой\n";
-                }
+                std::cout << "Новая f меньше старой, перезаписываем\n";
 #endif
             }
+            if (!isIn(neighbour, open))
+            {
+#ifdef COMMENTS
+                std::cout << "Добавляем вершину [" << ver.first << "] в open\n";
+#endif
+                open.push_back(neighbour);
+            }
+
+            //newF = curr->f + ver.second + h(neighbour->name, end);
+#ifdef COMMENTS
+            std::cout << "Новая f для [" << ver.first << "] равна " << newF << "\n";
+#endif
+            if (newF < neighbour->f)
+            {
+#ifdef COMMENTS
+                std::cout << "Новая f (" << newF << ") для [" << ver.first << "] меньше старой (" << neighbour->f << "). Обновление.\n";
+#endif
+
+                neighbour->g += ver.second;
+                neighbour->f = neighbour->g + h(ver.first, end);
+                neighbour->prev = curr;
+            }
+#ifdef COMMENTS
+            else
+            {
+                std::cout << "Новая f не лучше старой\n";
+            }
+#endif
         }
     }
 }
@@ -278,7 +280,7 @@ bool cmp(Vertex *a, Vertex *b)
     {
         return a->name > b->name;
     }
-    return a->f < b->f;
+    return (a->f < b->f);
 }
 
 bool aStar(char start, char end, std::vector<Vertex *> &vertices)
