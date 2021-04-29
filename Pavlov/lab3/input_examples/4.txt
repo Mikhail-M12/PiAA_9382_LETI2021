@@ -1,0 +1,21 @@
+18
+a
+k
+a b 12
+a c 22
+a d 21
+b e 9
+b f 10
+c e 9
+c g 8
+d f 3
+d g 8
+e h 5
+e i 8
+f h 3
+f j 5
+g i 7
+g j 3
+h k 11
+i k 17
+j k 13 
