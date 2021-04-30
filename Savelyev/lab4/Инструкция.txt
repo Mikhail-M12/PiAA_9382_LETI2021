@@ -1,1 +1,2 @@
-Ссылка на онлайн компилятор: https://replit.com/@Indiora/PiAAlab4#main.cpp
+Ссылка на онлайн компилятор stepick1: https://replit.com/@Indiora/PiAAlab4#main.cpp
+Ссылка на онлайн компилятор stepick2: https://replit.com/@Indiora/PiAAlab42#main.cpp
