@@ -160,11 +160,11 @@ std::pair<Vertex *, Vertex *> chooseVer(std::vector<Vertex *> graph, std::vector
         ver = retVer(name, graph);
         for (auto neib : ver->neighbours)
         {
-            if (retVer(neib.first, graph)->seen == 1)   //если в вершину уже "заходили", то пропускаем
+            if (retVer(neib.first, graph)->seen == 1) //если в вершину уже "заходили", то пропускаем
             {
                 continue;
             }
-            check = abs(neib.first - name);             //расстояние именами вершин
+            check = abs(neib.first - name); //расстояние именами вершин
             if ((check < min || check == min && neib.first < minV->name) && neib.second.first > 0)
             {
                 prev = ver;
@@ -259,23 +259,34 @@ void recount(int min, char end, std::vector<Vertex *> &graph)
     std::cout << "\t\tПропускная способность данного пути: " << min << "\n";
     std::vector<char> path;
 #endif
+#ifdef COMMENTS
+    std::cout << "\t\tНачало пересчета пропускных способностей:\n";
+#endif
     while (ver->from.second != nullptr) //пока не дойдем до начала
     {
 #ifdef PATH
         path.push_back(ver->name);
 #endif
-        ver->neighbours[prev].first -= min;
+#ifdef COMMENTS
+        std::cout << "\t\t\tИз пропускной способности ребра [" << ver->name << ", " << prev << "] было вычтено " << min << "\n";
+        std::cout << "\t\t\tК пропускной способности ребра [" << prev << ", " << ver->name << "] было прибавлено " << min << "\n\n";
+#endif
+        ver->neighbours[prev].first -= min; //вычитаем из использованного ребра
         ver->neighbours[prev].second += min;
         auto prevVer = retVer(prev, graph);
-        prevVer->neighbours[ver->name].first += min;
+        prevVer->neighbours[ver->name].first += min; //добавляем к обратному ребру
         prevVer->neighbours[ver->name].second -= min;
         prev = ver->name;
         ver = ver->from.second;
     }
+#ifdef COMMENTS
+    std::cout << "\t\t\tИз пропускной способности ребра [" << ver->name << ", " << prev << "] было вычтено " << min << "\n";
+    std::cout << "\t\tПересчет пропускных способностей окончен\n";
+#endif
 #ifdef PATH
     path.push_back(ver->name);
     std::cout << "\t\tПуть:\n\t\t";
-    for (char i = path.size()-1; i >= 0; i--)
+    for (char i = path.size() - 1; i >= 0; i--)
     {
         std::cout << path[i];
     }
