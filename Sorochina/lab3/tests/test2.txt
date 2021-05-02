@@ -1,0 +1,10 @@
+7
+a
+c
+b a 2
+a d 3
+d b 1
+d c 7
+a e 5
+e d 2
+b e 10
