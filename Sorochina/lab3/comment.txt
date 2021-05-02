@@ -1,4 +1,2 @@
-Запустить программу можно при помощи Visual Studio Code
-
-Или по ссылке https://replit.com/@oorschnai/lab3#
+Запустить программу можно по ссылке https://replit.com/@oorschnai/lab3#
 для запуска тестов можно запустить tests.sh, появится папка res с выводом для 6 тестов из отчета
