@@ -165,7 +165,7 @@ std::pair<Vertex *, Vertex *> chooseVer(std::vector<Vertex *> graph, std::vector
                 continue;
             }
             check = abs(neib.first - name);             //расстояние именами вершин
-            if ((check < min || check == min && neib.first < name) && neib.second.first > 0)
+            if ((check < min || check == min && neib.first < minV->name) && neib.second.first > 0)
             {
                 prev = ver;
                 min = check;
@@ -267,21 +267,19 @@ void recount(int min, char end, std::vector<Vertex *> &graph)
         ver->neighbours[prev].first -= min;
         ver->neighbours[prev].second += min;
         auto prevVer = retVer(prev, graph);
-        /*if (prevVer->neighbours.find(ver->name) != prevVer->neighbours.end())
-        {*/
         prevVer->neighbours[ver->name].first += min;
         prevVer->neighbours[ver->name].second -= min;
-        //}
         prev = ver->name;
         ver = ver->from.second;
     }
 #ifdef PATH
     path.push_back(ver->name);
     std::cout << "\t\tПуть:\n\t\t";
-    for (char i = path.size() - 1; i >= 0; i--)
+    for (char i = path.size()-1; i >= 0; i--)
     {
         std::cout << path[i];
     }
+    std::cout << end;
 #endif
     ver->neighbours[prev].first -= min;
     ver->neighbours[prev].second += min;
