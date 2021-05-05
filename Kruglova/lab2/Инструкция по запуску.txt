@@ -1,0 +1,9 @@
+Cсылка на онлайн компиллятор: https://replit.com/@kruglova9382/2#main.cpp
+Для запуска g++ main.cpp
+с консоли ./a.out <flag>
+Из файла ./a.out <flag> < input.txt
+Флаги: 
+-d -- Дейкстра
+-g -- Жадный алгоритм
+-as -- А*
+
