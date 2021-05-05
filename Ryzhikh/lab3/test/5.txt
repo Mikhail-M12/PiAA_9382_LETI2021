@@ -1,0 +1,10 @@
+8
+a f
+a b 10
+a c 10
+b x 5
+b y 3
+c x 2
+c y 4
+x f 1
+y f 2
