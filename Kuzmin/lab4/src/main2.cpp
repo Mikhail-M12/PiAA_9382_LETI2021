@@ -30,7 +30,7 @@ std::vector<int> countPrefixFunction(std::string str) {
 #endif
 
 		//цикл, который проверит все символы-кандидаты на составление префикса и дойдет до нуля, если среди них нет подходящих
-		while (1){
+		while (len > 0 && str[len] != str[i]){
 
 #ifdef INFO
 			std::string pre = "_";
@@ -38,8 +38,6 @@ std::vector<int> countPrefixFunction(std::string str) {
 				pre = str.substr(0, len);	
 			std::cout << "Пара-кандидат на дополнение префикса " << pre << " : " << str[len] << ", " << str[i] << "\n";
 #endif
-			//условие выхода из цикла
-			if (len == 0 || str[len] == str[i]) break;
 			//берется следующий возможный префикс-суффикс
 			len = p[len - 1];
 
@@ -53,6 +51,12 @@ std::vector<int> countPrefixFunction(std::string str) {
 		//увеличение длины префикса
 		if (str[len] == str[i])
 			len += 1;
+
+		//изменение дополняемого префикса
+		else if (len != 0) {
+			len = p[len - 1];
+		}
+
 
 		p[i] = len;
 #ifdef INFO
@@ -111,8 +115,8 @@ std::vector<int> findPatternKMP(std::string text, std::string pattern){
 #endif
 			match++;
 		}
-		//если не совпадает, то она становится равна длине префикса
-		else if (match != 0) {
+		//изменени длины совпадающей части префикса
+		else if (match != 0){
 #ifdef INFO
 			std::cout << "Найден несовпадающий символ. Изменение длины совпадающей части\n\n";
 #endif
@@ -145,7 +149,7 @@ void printIndexes(std::vector<int> indexes){
 	if (!indexes.empty()) {
 		int _len = indexes.size() - 1;
 		for (int i = 0; i < _len; i++)
-			std::cout << indexes[i] << ", ";
+			std::cout << indexes[i] << ",";
 		std::cout << indexes[_len];
 		return;
 	}
@@ -183,7 +187,7 @@ void doCircularShiftCheck() {
 		std::cout << "Релуьтат: ";
 	}
 #endif
-	std::cout << index<<"\n";
+	std::cout << index;
 }
 //вывод результата алгоритма КМП
 void doKMPSearch() {
@@ -198,11 +202,10 @@ void doKMPSearch() {
 	}
 	else {
 		std::cout << "Строка " << s2 << " не входит в" << s1 << "\n";
-		std::cout << "Результат: ";
+		std::cout << "Релуьтат: ";
 	}
 #endif
 	printIndexes(indexes);
-	std::cout<<"\n";
 }
 int main() {
 
