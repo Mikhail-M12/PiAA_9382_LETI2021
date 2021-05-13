@@ -5,18 +5,20 @@ from typing import List, Optional
 import typing
 import sys
     
-class Graph:
+class Graph: 
     def __init__(self, inputGraph = {}):
         self.graph = inputGraph
 
     def copy(self):
+        # copy method
         return Graph(copy.deepcopy(self.graph))
 
     def print(self):
+        # std output, stepick way
         list = []
         for i in self.graph:
             for j in self.graph[i]:
-                res = int(self.graph[i][j][1])
+                res = int(self.graph[i][j][1]) # [1] because negative flows == used flows in the algorithm
                 list.append("{} {} {}".format(i,j, res))
                 # list.append("{} {} {}".format(i,j,self.graph[i][j]))
         res = sorted(list)
@@ -24,28 +26,34 @@ class Graph:
             print(i)
 
     def addEdge(self, root, leaf, value):
+        print("Adding edge from ", root, "to", leaf, "with value ", value)
+        # Add edge to the graph, if there is no one already
         if root not in self.graph:
             self.graph[root] = {}  
         if leaf not in self.graph[root]:
-          self.graph[root][leaf] = [value, 0]
+          self.graph[root][leaf] = [value, 0] # Forward and backward flow
 
 
     def useFlow(self, a, b, flow):
-      if a not in self.graph or b not in self.graph:
-        return
-      if self.graph[b][a][1] > 0:
-        dif = flow - self.graph[b][a][1]
-        self.graph[b][a][1] = 0
-        self.graph[b][a][0] += flow - dif
+        print("Adding flow from ", a, "to", b, "equal ", flow)
+        # Add flow from a to b nodes on the result map
+        if a not in self.graph or b not in self.graph:
+            return
+        if self.graph[b][a][1] > 0:
+            dif = flow - self.graph[b][a][1]
+            self.graph[b][a][1] = 0
+            self.graph[b][a][0] += flow - dif
 
-        self.graph[a][b][0] -= dif
-        self.graph[a][b][1] += dif
-      
-      else:  
-        self.graph[a][b][0] -= flow
-        self.graph[a][b][1] += flow
+            self.graph[a][b][0] -= dif
+            self.graph[a][b][1] += dif
+        
+        else:  
+            self.graph[a][b][0] -= flow
+            self.graph[a][b][1] += flow
 
     def givePath(self, start, end):
+        print("Looking for path from ", start, "to", end)
+        # returns path with positive flow from start to finish
         currentPath = []
         stack = []
         handeledNodes = {}
@@ -57,7 +65,9 @@ class Graph:
             if currentNode not in handeledNodes:
                 currentPath.append(currentNode)
                 for i in self.graph[currentNode]:
+                    print("Handeling path", currentNode, "->", i)
                     if (self.graph[currentNode][i][0] > 0 or self.graph[i][currentNode][1] > 0) and i not in handeledNodes:
+                        print("Found good path")
                         stack.append(i)
                         if i == end:
                             currentPath.append(i)
@@ -70,6 +80,8 @@ class Graph:
         return currentPath
 
     def usePath(self, path):
+        print("Using path ", path)
+        # uses created path to change flows in the system 
         values = []
         for i in range(len(path)-1):
             first = path[i]
@@ -85,16 +97,8 @@ class Graph:
                 
         return flow
 
-    def addPath(self, path, flow):
-        for i in range(len(path)-1):
-            first = path[i]
-            second = path[i+1]
-            if first not in self.graph:
-                graph.addEdge(first, second, flow)
-            else:
-                self.useFlow(self, first, second, flow)
-
 def fordsAlg(graph : Graph, source, runoff):
+    # The main algoritm
     totalFlow = 0
     graphCopy = graph.copy()
     for i in graph.graph:
@@ -103,13 +107,16 @@ def fordsAlg(graph : Graph, source, runoff):
 
     path = graphCopy.givePath(source, runoff)
     while path != []:
+        print("Handeling new path")
         flow = graphCopy.usePath(path)
         totalFlow += flow
+        print("Now total flow is ", totalFlow)
         path = graphCopy.givePath(source, runoff)
         
     return (graphCopy, totalFlow)
 
 def inputHandler(inputList):
+    # Handeling raw input
     graph = Graph()
     source = inputList[0]
     runoff = inputList[1]
