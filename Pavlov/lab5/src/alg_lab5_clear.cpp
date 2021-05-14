@@ -61,7 +61,7 @@ Node* createBohr(const vector<pair<string, int>>& patterns) {
 			cur->ptnNum.push_back(ptnNum);
 		}
 		// для конечной вершины
-		cut->termPtnNum = ptnNum;
+		cur->termPtnNum = ptnNum;
 		cur->terminal = true;
 #if TASK == 2
 		cur->shifts.push_back(pt.second);
@@ -143,7 +143,7 @@ pair<int, int> longestLinks(Node* bohr, Node* root, int& depth) {
 	return longest;
 }
 
-void ahoCor(const string& t, const vector<pair<string, int>>& patterns, vector<pair<int, int>>& res) {
+void ahoCor(const string& t, const vector<pair<string, int>>& patterns, vector<pair<int, int>>& res, int ptnLength = 0) {
 	Node* bohr = createBohr(patterns);
 	writeLinks(bohr);
 	int depth = 0;
@@ -163,7 +163,7 @@ void ahoCor(const string& t, const vector<pair<string, int>>& patterns, vector<p
 			res.push_back({ i - patterns.at(tLink->termPtnNum).first.length() + 2, tLink->termPtnNum + 1 });
 #elif TASK == 2
 			for (auto& sh : tLink->shifts) {
-				int idx = i - patterns.at(tLink->ptnNum.at(0)).first.length() - sh + 1;
+				int idx = i - patterns.at(tLink->termPtnNum).first.length() - sh + 1;
 				if (!(idx < 0)) {
 					tInd.at(idx)++;
 				}
@@ -176,7 +176,7 @@ void ahoCor(const string& t, const vector<pair<string, int>>& patterns, vector<p
 			res.push_back({ i - patterns.at(cur->termPtnNum).first.length() + 2, cur->termPtnNum + 1 });
 #elif TASK == 2
 			for (auto& sh : cur->shifts) {
-				int idx = i - patterns.at(cur->ptnNum.at(0)).first.length() - sh + 1;
+				int idx = i - patterns.at(cur->termPtnNum).first.length() - sh + 1;
 				if (!(idx < 0)) {
 					tInd.at(idx)++;
 				}
@@ -187,7 +187,7 @@ void ahoCor(const string& t, const vector<pair<string, int>>& patterns, vector<p
 
 #if TASK == 2
 	for (int i = 0; i < tInd.size(); i++) {
-		if (tInd[i] == patterns.size()) {
+		if (tInd[i] == patterns.size() && i + ptnLength <= t.length()) {
 			res.push_back({ i + 1, 0 });
 		}
 	}
@@ -227,13 +227,13 @@ int main() {
 		std::cin >> s;
 		pts.push_back({ s, 0 });
 	}
+	ahoCor(t, pts, res);
 #elif TASK == 2
 	cin >> p;
 	cin >> j;
 	preparePts(p, j, pts);
+	ahoCor(t, pts, res, p.length());
 #endif
-
-	ahoCor(t, pts, res);
 
 	if (res.empty()) {
 		cout << "\nПоиск не дал результатов\n";
