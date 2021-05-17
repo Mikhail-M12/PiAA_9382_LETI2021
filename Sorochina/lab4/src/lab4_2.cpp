@@ -6,16 +6,16 @@
 
 void input(std::string &A, std::string &B);
 //функция, считывающая ввод
-std::vector<int> initialPi(std::string p);
+std::vector<int> initialPi(std::string &p);
 //функция вычисления префикс-функции
-int answer(std::string p, std::string t);
+int answer(std::string &p, std::string &t);
 //функция поиска ответа
 
 int main()
 {
     std::string A, B;
 #ifdef COMMENTS
-    std::cout << "Введите шаблон и текст\n";
+    std::cout << "Введите 2 строки\n";
 #endif
     input(A, B);
     if (A.length() != B.length())
@@ -53,47 +53,46 @@ void input(std::string &A, std::string &B)
     getline(std::cin, B);
 }
 
-std::vector<int> initialPi(std::string p)
+std::vector<int> initialPi(std::string &p)
 //функция вычисления префикс-функции
 //возвращает вектор - префикс-функцию
 {
     std::vector<int> pi;
     int len = p.length();
-    pi.resize(len);   //меняем размер массива на длину шаблона
-    pi[0] = 0;        //первый элемент всегда 0
-    int i = 1, j = 0; //i - индекс для суффикса, j - для префикса
-    while (i < len)
+    pi.resize(len);             //меняем размер массива на длину шаблона
+    pi[0] = 0;                  //первый элемент всегда 0
+    int suffix = 1, prefix = 0; //suffix - индекс для суффикса, prefix - для префикса
+    while (suffix < len)
     {
-        if (p[i] == p[j])
+        if (p[suffix] == p[prefix])
         {
-            pi[i] = j + 1;
-            i++;
-            j++;
+            pi[suffix] = prefix + 1;
+            suffix++;
+            prefix++;
         }
         else
         {
-            if (j == 0)
+            if (prefix == 0)
             {
-                pi[i] = 0;
-                i++;
+                pi[suffix] = 0;
+                suffix++;
             }
             else
             {
-                j = pi[j - 1];
+                prefix = pi[prefix - 1];
             }
         }
     }
     return pi;
 }
 
-int answer(std::string p, std::string t)
+int answer(std::string &p, std::string &t)
 {
     int ans = -1;
-
     std::vector<int> pi;
-    int len = p.length();
-    pi.resize(len);
-    pi = initialPi(p);
+    int p_len = p.length();
+    pi.resize(p_len);
+    pi = initialPi(p); //считаем префикс-функцию для р aka А
 #ifdef COMMENTS
     std::cout << "\tПрефикс-функция шаблона:\n\t";
     for (auto i : p)
@@ -108,30 +107,31 @@ int answer(std::string p, std::string t)
     std::cout << '\n';
 #endif
 
-    int k = 0, l = 0;
-    bool flag = false;
-    while (k < t.length())
+    int t_ind = 0, p_ind = 0;
+    bool flag = false; //флаг для отметки первый раз идем по строке или уже второй
+    int t_len = t.length();
+    while (t_ind < t_len)
     {
 #ifdef COMMENTS
-        std::cout << "\tСравним A[" << k << "] '" << t[k] << "' и B[" << l << "] '" << p[l] << "'\n";
+        std::cout << "\tСравним A[" << t_ind << "] '" << t[t_ind] << "' и B[" << p_ind << "] '" << p[p_ind] << "'\n";
 #endif
-        if (t[k] == p[l])
+        if (t[t_ind] == p[p_ind])
         {
 #ifdef COMMENTS
             std::cout << "\t\tРавны\n";
 #endif
-            k++;
-            l++;
-            if (l == len)
+            t_ind++;
+            p_ind++;
+            if (p_ind == p_len)
             {
                 if (flag)
                 {
-                    k += t.length();
+                    t_ind += t_len;
                 }
 #ifdef COMMENTS
-                std::cout << "\t\tНашли циклический сдвиг. Начинается с " << k - len << "\n";
+                std::cout << "\t\tНашли циклический сдвиг. Начинается с " << t_ind - p_len << "\n";
 #endif
-                ans = k - len;
+                ans = t_ind - p_len;
                 return ans;
             }
         }
@@ -140,19 +140,19 @@ int answer(std::string p, std::string t)
 #ifdef COMMENTS
             std::cout << "\t\tНЕ равны\n";
 #endif
-            if (l == 0)
+            if (p_ind == 0)
             {
-                k++;
+                t_ind++;
             }
             else
             {
-                l = pi[l - 1];
+                p_ind = pi[p_ind - 1];
             }
         }
-        if (k == t.length() && flag == false)
+        if (t_ind == t_len && flag == false) //если дошли до конца строки первый раз,
         {
-            k = 0;
-            flag = true;
+            t_ind = 0;   //то переход на начало
+            flag = true; //меняем флаг
         }
     }
 #ifdef COMMENTS

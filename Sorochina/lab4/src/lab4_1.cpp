@@ -6,9 +6,9 @@
 
 void input(std::string &p, std::string &t);
 //функция, считывающая ввод
-std::vector<int> initialPi(std::string p);
+std::vector<int> initialPi(std::string &p);
 //функция вычисления префикс-функции
-std::vector<int> answer(std::string p, std::string t);
+std::vector<int> answer(std::string &p, std::string &t);
 //функция поиска ответа
 
 int main()
@@ -46,47 +46,47 @@ void input(std::string &p, std::string &t)
     getline(std::cin, t);
 }
 
-std::vector<int> initialPi(std::string p)
+std::vector<int> initialPi(std::string &p)
 //функция вычисления префикс-функции
 //возвращает вектор - префикс-функцию
 {
     std::vector<int> pi;
     int len = p.length();
-    pi.resize(len);   //меняем размер массива на длину шаблона
-    pi[0] = 0;        //первый элемент всегда 0
-    int i = 1, j = 0; //i - индекс для суффикса, j - для префикса
-    while (i < len)
+    pi.resize(len);             //меняем размер массива на длину шаблона
+    pi[0] = 0;                  //первый элемент всегда 0
+    int suffix = 1, prefix = 0; //suffix - индекс для суффикса, prefix - для префикса
+    while (suffix < len)
     {
-        if (p[i] == p[j])
+        if (p[suffix] == p[prefix])
         {
-            pi[i] = j + 1;
-            i++;
-            j++;
+            pi[suffix] = prefix + 1;
+            suffix++;
+            prefix++;
         }
         else
         {
-            if (j == 0)
+            if (prefix == 0)
             {
-                pi[i] = 0;
-                i++;
+                pi[suffix] = 0;
+                suffix++;
             }
             else
             {
-                j = pi[j - 1];
+                prefix = pi[prefix - 1];
             }
         }
     }
     return pi;
 }
 
-std::vector<int> answer(std::string p, std::string t)
+std::vector<int> answer(std::string &p, std::string &t)
 //функция поиска ответа
 //возвращает вектор, элементы которого - индексы начал вхождения. Если он пуст, то вхождений нет
 {
     std::vector<int> ans; //вектор для записи ответа
     std::vector<int> pi;
-    int len = p.length();
-    pi.resize(len);
+    int p_len = p.length();
+    pi.resize(p_len);
     pi = initialPi(p); //вычисляем префикс-функцию для шаблона
 #ifdef COMMENTS
     std::cout << "\tПрефикс-функция шаблона:\n\t";
@@ -102,26 +102,27 @@ std::vector<int> answer(std::string p, std::string t)
     std::cout << '\n';
 #endif
 
-    int k = 0, l = 0; //k - индекс для прохода по тексту, l - по шаблону
-    while (k < t.length())
+    int t_ind = 0, p_ind = 0; //t_ind - индекс для прохода по тексту, p_ind - по шаблону
+    int t_len = t.length();
+    while (t_ind < t_len)
     {
 #ifdef COMMENTS
-        std::cout << "\tСравним t[" << k << "] '" << t[k] << "' и p[" << l << "] '" << p[l] << "'\n";
+        std::cout << "\tСравним t[" << t_ind << "] '" << t[t_ind] << "' и p[" << p_ind << "] '" << p[p_ind] << "'\n";
 #endif
-        if (t[k] == p[l])
+        if (t[t_ind] == p[p_ind])
         {
 #ifdef COMMENTS
             std::cout << "\t  Равны\n";
 #endif
-            k++;
-            l++;
-            if (l == len)
+            t_ind++;
+            p_ind++;
+            if (p_ind == p_len)
             {
 #ifdef COMMENTS
-                std::cout << "\t  Дошли до конца шаблона. Шаблон содержится в тексте с " << k - len << "\n";
+                std::cout << "\t  Дошли до конца шаблона. Шаблон содержится в тексте с " << t_ind - p_len << "\n";
 #endif
-                ans.push_back(k - len);
-                l = pi[l - 1];
+                ans.push_back(t_ind - p_len);
+                p_ind = pi[p_ind - 1];
             }
         }
         else
@@ -129,13 +130,13 @@ std::vector<int> answer(std::string p, std::string t)
 #ifdef COMMENTS
             std::cout << "\t  НЕ равны\n";
 #endif
-            if (l == 0)
+            if (p_ind == 0)
             {
-                k++;
+                t_ind++;
             }
             else
             {
-                l = pi[l - 1];
+                p_ind = pi[p_ind - 1];
             }
         }
     }
