@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#define COMMENTS
+//#define COMMENTS
 
 void input(std::string &A, std::string &B);
 //функция, считывающая ввод
@@ -18,7 +18,7 @@ int main()
     std::cout << "Введите 2 строки\n";
 #endif
     input(A, B);
-    if (A.length() != B.length())
+    if (A.length() != B.length()) //если длина строк не равна, то точно не циклический сдвиг
     {
 #ifdef COMMENTS
         std::cout << "Строки разной длины\n";
@@ -26,7 +26,7 @@ int main()
         std::cout << "-1\n";
         return 0;
     }
-    if (A == B)
+    if (A == B) //если равны, то сдвиг равен 0
     {
 #ifdef COMMENTS
         std::cout << "Строки совпадают\n";
@@ -64,22 +64,39 @@ std::vector<int> initialPi(std::string &p)
     int suffix = 1, prefix = 0; //suffix - индекс для суффикса, prefix - для префикса
     while (suffix < len)
     {
-        if (p[suffix] == p[prefix])
+#ifdef COMMENTS
+        std::cout << "\n\t\tИндекс суффикса: " << suffix << "(" << p[suffix] << ")"
+                  << ", индекс префикса: " << prefix << "(" << p[prefix] << ")"
+                  << "\n";
+#endif
+        if (p[suffix] == p[prefix]) //если символы равны,
         {
-            pi[suffix] = prefix + 1;
-            suffix++;
+#ifdef COMMENTS
+            std::cout << "\t\tСимволы равны. Значение для " << suffix << "-го элемента равно " << prefix + 1 << "\n";
+#endif
+            pi[suffix] = prefix + 1; //то записываем значение префикс-функции для эл-та
+            suffix++;                //увеличиваем индексы
             prefix++;
         }
-        else
+        else // Если символы не равны
         {
-            if (prefix == 0)
+#ifdef COMMENTS
+            std::cout << "\t\tСимволы не равны.";
+#endif
+            if (prefix == 0) // ...и индекс префикса равен нулю
             {
-                pi[suffix] = 0;
-                suffix++;
+#ifdef COMMENTS
+                std::cout << " Значение для " << suffix << "-го элемента равно 0\n";
+#endif
+                pi[suffix] = 0; //то значение функции для данного эл-та равно 0
+                suffix++;       //идем к след. эл-ту
             }
-            else
+            else //...и индекс префикса не равен нулю
             {
-                prefix = pi[prefix - 1];
+#ifdef COMMENTS
+                std::cout << "\n\t\tНовый индекс префикса: " << pi[prefix - 1] << "(" << p[pi[prefix - 1]] << ")\n";
+#endif
+                prefix = pi[prefix - 1]; //то меняем индекс особым образом
             }
         }
     }
@@ -94,7 +111,7 @@ int answer(std::string &p, std::string &t)
     pi.resize(p_len);
     pi = initialPi(p); //считаем префикс-функцию для р aka А
 #ifdef COMMENTS
-    std::cout << "\tПрефикс-функция шаблона:\n\t";
+    std::cout << "\n\tПрефикс-функция шаблона:\n\t";
     for (auto i : p)
     {
         std::cout << i << " ";
@@ -110,23 +127,24 @@ int answer(std::string &p, std::string &t)
     int t_ind = 0, p_ind = 0;
     bool flag = false; //флаг для отметки первый раз идем по строке или уже второй
     int t_len = t.length();
-    while (t_ind < t_len)
+    while (t_ind < t_len) //пока индекс не равен длине строки
     {
 #ifdef COMMENTS
-        std::cout << "\tСравним A[" << t_ind << "] '" << t[t_ind] << "' и B[" << p_ind << "] '" << p[p_ind] << "'\n";
+        std::cout << "\n\tСравним A[" << t_ind << "] '" << t[t_ind] << "' и B[" << p_ind << "] '" << p[p_ind] << "'\n";
 #endif
-        if (t[t_ind] == p[p_ind])
+        if (t[t_ind] == p[p_ind]) //если символы равны, то
         {
 #ifdef COMMENTS
             std::cout << "\t\tРавны\n";
+            std::cout << "\t  Текущая совпадающая длина: " << p_ind << "\n";
 #endif
-            t_ind++;
+            t_ind++; //увеличиваем индексы
             p_ind++;
-            if (p_ind == p_len)
+            if (p_ind == p_len) //если конец шаблона, то
             {
-                if (flag)
+                if (flag) //если это второй проход по строке
                 {
-                    t_ind += t_len;
+                    t_ind += t_len; //добавляем к индексу длину строки
                 }
 #ifdef COMMENTS
                 std::cout << "\t\tНашли циклический сдвиг. Начинается с " << t_ind - p_len << "\n";
@@ -135,24 +153,33 @@ int answer(std::string &p, std::string &t)
                 return ans;
             }
         }
-        else
+        else //если символы не равны
         {
 #ifdef COMMENTS
             std::cout << "\t\tНЕ равны\n";
 #endif
-            if (p_ind == 0)
+            if (p_ind == 0) //есди первый элемент строки-шаблона
             {
-                t_ind++;
+#ifdef COMMENTS
+                std::cout << "\t  Проверяли первый элемент строки-шаблона, значит идем дальше по тексту\n";
+#endif
+                t_ind++; //увеличиваем индекс в строке-тексте
             }
-            else
+            else //если не первый эл-т
             {
-                p_ind = pi[p_ind - 1];
+#ifdef COMMENTS
+                std::cout << "\t  Новый индекс строки-шаблона: " << pi[p_ind - 1] << "(" << p[pi[p_ind - 1]] << ")\n";
+#endif
+                p_ind = pi[p_ind - 1]; //меняем индекс строки-шаблона
             }
         }
         if (t_ind == t_len && flag == false) //если дошли до конца строки первый раз,
         {
-            t_ind = 0;   //то переход на начало
-            flag = true; //меняем флаг
+#ifdef COMMENTS
+            std::cout << "\t  Первый раз дошли до конца строки-текста. Меняем флаг и переходим на первый элемент.\n";
+#endif
+                t_ind = 0; //то переход на начало
+            flag = true;   //меняем флаг
         }
     }
 #ifdef COMMENTS
