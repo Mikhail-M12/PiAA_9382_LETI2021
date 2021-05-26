@@ -121,15 +121,15 @@ void KMP::CyclicShift() {
         int j = i % aLength;
         if (B[curBLength] != A[j]) //если символы не равны
 #ifdef INFO
-            std::cout << "Несовпадение " << j << " символа строки А " << '(' << A[j] << ')' << " и " << curBLength << " символа строки В " << '(' << B[curBLength] << ")";
+            std::cout << "Несовпадение " << j << " символа строки А " << '(' << A[j] << ')' << " и " << curBLength << " символа строки В " << '(' << B[curBLength] << ")\n";
 #endif
         while (curBLength > 0 && B[curBLength] != A[j]) {
             curBLength = arrPrefix[curBLength - 1];
         }
-        std::cout << '\n';
+
         if (B[curBLength] == A[j]) { //если символы равны
 #ifdef INFO
-            std::cout << "Найдено совпадение " << j << " символа строки А " << '(' << A[j] << ')' << " и " << curBLength << " символа строки В " << '(' << B[curBLength] << ")";
+            std::cout << "Найдено совпадение " << j << " символа строки А " << '(' << A[j] << ')' << " и " << curBLength << " символа строки В " << '(' << B[curBLength] << ")\n";
 #endif
             curBLength++;
         }

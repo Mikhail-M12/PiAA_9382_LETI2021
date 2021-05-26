@@ -115,6 +115,9 @@ void KMP::AlgorithmKMP() {
     int pIndex = 0;
     int tIndex = 0;
     while (tIndex < tSize) {
+#ifdef INFO
+        std::cout << "Рассматривается " << pIndex << " символа образца " << P[pIndex] << " и " << tIndex << " символа текста " << T[tIndex] << '\n';
+#endif
         if (P[pIndex] == T[tIndex]) {  //если символы равны
 #ifdef INFO
             std::cout << "Найдено совпадение " << pIndex << " символа образца " << P[pIndex] << " и " << tIndex << " символа текста " << T[tIndex] << '\n';
@@ -130,9 +133,24 @@ void KMP::AlgorithmKMP() {
             }
         }
         else if (pIndex == 0) // если сравнение с первым символом
+        {
+#ifdef INFO
+            std::cout << "Cовпадение " << pIndex << " символа образца " << P[pIndex] << " и " << tIndex << " символа текста " << T[tIndex] << " не найдено\n";
+            std::cout << "Сдвигаемся дальше по тексту\n";
+#endif
             tIndex++;
+        }
         else  //если же по образцу продвинулись
+        {
+#ifdef INFO
+            std::cout << "Cовпадение " << pIndex << " символа образца " << P[pIndex] << " и " << tIndex << " символа текста " << T[tIndex] << " не найдено\n";
+            std::cout << "Индекс образца принимает значение предыдущего префикса: " << arrPrefix[pIndex - 1] << '\n';
+#endif
             pIndex = arrPrefix[pIndex - 1];
+        }
+#ifdef INFO
+        std::cout << '\n';
+#endif
     }
 }
 
