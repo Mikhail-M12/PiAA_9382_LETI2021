@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <map>
 #include <functional>
-#include <tuple>
 #define NEWLINE std::cout<<"\n";
 #define INFO
 class Vertex {
@@ -363,8 +362,7 @@ std::vector<std::pair<int, int>> findMatches(std::string text, std::vector<std::
 #endif
     trie.buildGraph(patterns);
     trie.buildSuffixLinks();
-    if (!skip) //если рассматриваются все подстроки, а не только непересекающиеся
-        trie.findReachableThroughSuffixLinks(patterns);
+    trie.findReachableThroughSuffixLinks(patterns);
     StateMachine a(trie.root);
     a.buildStateMachine(trie);
 #ifdef INFO
@@ -391,16 +389,16 @@ std::vector<std::pair<int, int>> findMatches(std::string text, std::vector<std::
             indexesAndPatterns.push_back(tmp_pairss);
             if (skip){
 #ifdef INFO
-                std::cout << "Найден образец. Переход в начальное состояние\n\n";
+                std::cout << "Переход в начальное состояние\n\n";
 #endif
                 a.currentState = trie.root;
                 continue;
             }
             NEWLINE
         }
+        
         //проверка строк, достижимых по суффиксным ссылкам
-        if (!skip)
-        for (const auto& en : a.currentState->reachable) {
+        for (const auto& en : a.currentState->reachable){
 
             if (en != a.currentState->end) {
 #ifdef INFO
@@ -409,8 +407,17 @@ std::vector<std::pair<int, int>> findMatches(std::string text, std::vector<std::
 
                 auto tmp_pair = std::make_pair(i - patterns[en - 1].size() + 2, en);
                 indexesAndPatterns.push_back(tmp_pair);
+                if (skip) {
+                   
+#ifdef INFO         
+                    std::cout << "Переход в начальное состояние\n\n";
+#endif
+                    a.currentState = trie.root;
+                    break;
+                }
             }
         }
+       
         //-----------------------
 #ifdef INFO
         std::cout << "\n";
@@ -555,6 +562,6 @@ int main() {
     setlocale(LC_ALL, "rus");
 
     interfaceWildCard();
-   // interfaceAhoCorasick();
+    //interfaceAhoCorasick();
     return 0;
 }
