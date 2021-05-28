@@ -10,14 +10,14 @@ class BohrVertex{
 public:
 	int parent;
 	char value;
-    int next_ver[ALPHABET_LEN];
+	int next_ver[ALPHABET_LEN];
 	std::vector <int> num_pattern;	
 	bool flag = false; // является ли шаблоном
 	int suffix_link = -1; // суффиксная ссылка от этой вершины
 	int move[ALPHABET_LEN];
-    BohrVertex(int, char);
+	BohrVertex(int, char);
 	BohrVertex() = default;
-    ~BohrVertex() = default;
+	~BohrVertex() = default;
 };
 
 class Bohr{
@@ -82,10 +82,10 @@ int Bohr::get_suffix_link(int v){
 
 // перемещаемся по бору по ребру edge
 int Bohr::get_move(int v, int edge){
-    if (bohr[v].move[edge] == -1)
-        if (bohr[v].next_ver[edge] != -1)
-         	bohr[v].move[edge] = bohr[v].next_ver[edge];
-        else
+	if (bohr[v].move[edge] == -1)
+		if (bohr[v].next_ver[edge] != -1)
+			bohr[v].move[edge] = bohr[v].next_ver[edge];
+		else
 			if (v == 0)
 				bohr[v].move[edge] = 0;
 			else
@@ -95,7 +95,7 @@ int Bohr::get_move(int v, int edge){
 
 void Bohr::res(int v, int i, std::vector <int>& array, std::vector <int> len){
 	 for(int u = v;u != 0;u = get_suffix_link(u))
-        if (bohr[u].flag){
+		if (bohr[u].flag){
 			for (const auto &j : bohr[u].num_pattern)
 				if ((i - len[j] < array.size())) 
 					array[i - len[j]]++;
@@ -133,9 +133,9 @@ void Bohr::find_matches(std::map<char, int> m, std::string &s, std::vector <int>
 	for (int i = 0; i < lenght; i++){
 		char symb = s[i];
 		edge = m[symb];
-        u = get_move(u, edge);
-        res(u, i + 1, array, len);
-    }
+		u = get_move(u, edge);
+		res(u, i + 1, array, len);
+	}
 }
 	
 int main(){
