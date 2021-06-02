@@ -3,6 +3,7 @@
 #include <string>
 #include <queue>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 
@@ -25,7 +26,7 @@ class AhoKorasik {
   void init(const std::vector<std::string> &words) {
     // Build bor
 #ifdef DEBUG
-    std::cout << "Building tree for words:"; 
+    std::cout << "Building tree for words:\n"; 
     for (auto &word : words)
       std::cout << "  " << word << "\n";
     std::cout << "\n";
@@ -54,6 +55,7 @@ class AhoKorasik {
         } else {  // else add new node
 #ifdef DEBUG
           std::cout << "  No child node with this symbol, creating new and go there\n";
+          std::cout << "  New node: {" << c << ", " << total + 1 << "}\n";
 #endif
           node newNode;
           this->bor.push_back(newNode);
@@ -143,7 +145,10 @@ class AhoKorasik {
         // termination node
         if (!this->term[this->suff_link[pos]].empty()) {
 #ifdef DEBUG
-        std::cout << "Suffix link was terminal node, add same mark to cuurent child\n";
+        std::cout << "Suffix link was terminal node for words <<";
+        for (auto &w : term[suff_link[pos]])
+          std::cout << w << " ";
+        std::cout << "\nAdd same marks to current child\n";
 #endif
           for (auto item : this->term[this->suff_link[pos]]) {
             this->term[pos].push_back(item);
@@ -179,9 +184,9 @@ class AhoKorasik {
   }
 
   // Process one symbol in machine
-  std::vector<int> process(char letter) {
+  std::vector<int> process(char letter, int ind) {
 #ifdef DEBUG
-    std::cout << "Searching symbol " << letter << "\n";
+    std::cout << "Searching symbol " << letter << ", position:" << ind << "\n";
 #endif
     // Find the matching position in machine by suffix links.
     while (this->curPos > 0 && this->bor[this->curPos].find(letter) == this->bor[this->curPos].end()) {
@@ -211,22 +216,12 @@ class AhoKorasik {
   }
 
   //find all patterns in text + cut text
-  std::string find_all_words(const std::string &text) {
-    int n = 0;
-    std::cin >> n;
-
-    std::vector<std::string> words;
-    for (int i = 0; i < n; i++) {
-      std::string word;
-      std::cin >> word;
-      words.push_back(word);
-    }
-
+  std::string find_all_words(const std::string &text, const std::vector<std::string> &words) {
     init(words);
 
     std::vector<std::pair<int, int>> res;
     for (int pos = 0; pos < text.length(); pos++) {
-      std::vector<int> pats = process(text[pos]);
+      std::vector<int> pats = process(text[pos], pos);
       if (!pats.empty()) {
         for (auto point : pats) {
           int patternLength = words[point].length();
@@ -252,12 +247,7 @@ class AhoKorasik {
     return crop;
   }
 
-  std::string find_with_joker(const std::string &text) {
-    std::string word;
-    std::cin >> word;
-    char joker;
-    std::cin >> joker;
-
+  std::string find_with_joker(const std::string &text, const std::string &word, char joker) {
     std::vector<int> predictions(text.length(), 0);
     std::vector<std::string> patterns;
     std::vector<int> index;
@@ -279,16 +269,22 @@ class AhoKorasik {
     init(patterns);
     
     for (int pos = 0; pos < text.length(); pos++) {
-      std::vector<int> pats = process(text[pos]);
+      std::vector<int> pats = process(text[pos], pos);
       if (!pats.empty()) {
         for (auto point : pats) {
           int firstLetter = pos - patterns[point].length() + 1;
-          int idx = firstLetter - index[point] + 1;
+          int idx = firstLetter - index[point];
           if (idx >= 0 && idx < predictions.size()) {
-            predictions[firstLetter - index[point] + 1]++;
+            predictions[idx]++;
           }
         }
       }
+      #ifdef DEBUG
+      std::cout << "Current predictions array:";
+      for (auto n : predictions)
+        std::cout << n << " ";
+      std::cout << "\n\n";
+      #endif
     }
 
     std::string crop = text;
@@ -296,7 +292,7 @@ class AhoKorasik {
       if (predictions[i] == patterns.size()) {
         for (int j = i - 1; j < word.size() + i - 1; j++)
           crop[j] = '-';
-        std::cout << i << std::endl;
+        std::cout << i + 1 << std::endl;
       }
     }
 
@@ -314,18 +310,33 @@ int main() {
 
   AhoKorasik instance;
   std::string entr;
+  std::ifstream input("input.txt");
 #ifdef TASK1
 #ifdef DEBUG
-  std::cout << "Second task\nInput:\n";
+  std::cout << "First task\nInput:\n";
 #endif
-  std::cin >> seq;
-  entr = instance.find_all_words(seq);
+  input >> seq;
+  
+  int n = 0;
+  input >> n;
+
+  std::vector<std::string> words;
+  for (int i = 0; i < n; i++) {
+    std::string word;
+    input >> word;
+    words.push_back(word);
+  }
+  entr = instance.find_all_words(seq, words);
 #else
 #ifdef DEBUG
   std::cout << "Second task\nInput:\n";
 #endif
-  std::cin >> seq;
-  entr = instance.find_with_joker(seq);
+  input >> seq;
+  std::string word;
+  input >> word;
+  char joker;
+  input >> joker;
+  entr = instance.find_with_joker(seq, word, joker);
 #endif
 
 #ifdef DEBUG
