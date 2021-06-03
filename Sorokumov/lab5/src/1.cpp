@@ -235,7 +235,7 @@ private:
         }
     }
 
-    std::vector<std::pair<int, int>> answer;
+    std::vector<std::pair<int, int> > answer;
     std::vector <bohr_vertex> bohr;//бор
     std::vector <std::string> pattern;//шаблоны
 };
