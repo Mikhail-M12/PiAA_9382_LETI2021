@@ -78,10 +78,18 @@ void kmp(std::string sample, std::string text, std::vector<int> prefix_arr,
     }
     // если сравнение было с первым символом
     else if (sample_i == 0) {
+        std::cout << "Не совпали " << sample_i << " символа образца "
+                  << "(" << sample[sample_i] << ") "
+                  << "и " << text_i << " символа текста "
+                  << "(" << text[text_i] << ") " << "\n";
       text_i++;
     }
     // если по образцу продвинулись
     else {
+        std::cout << "Не совпали " << sample_i << " символа образца "
+                  << "(" << sample[sample_i] << ") "
+                  << "и " << text_i << " символа текста "
+                  << "(" << text[text_i] << ") " << "\n";
       sample_i = prefix_arr[sample_i - 1];
     }
   }
@@ -96,6 +104,7 @@ int main() {
   std::cout << "Введите строку В" << '\n';
   std::cin >> string_b;
 
+
   kmp(string_a, string_b, create_prefix(string_a), answer);
   std::cout << "" << '\n';
   bool flag = true;
@@ -104,7 +113,7 @@ int main() {
   } else {
     // выводим ответ
     for (auto a : answer) {
-      // если не первый символ из массива
+    // если не первый символ из массива
       if (flag) {
         flag = false;
       } else {
@@ -113,6 +122,7 @@ int main() {
       std::cout << a;
     }
   }
+
 
   return 0;
 }
