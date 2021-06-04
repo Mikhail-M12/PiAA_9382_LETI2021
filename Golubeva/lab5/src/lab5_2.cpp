@@ -8,9 +8,9 @@
 
 class BohrVertex{
 public:
-	int parent;
+	int parent;//вершина - родитель
 	char value;
-	int next_ver[ALPHABET_LEN];
+	int next_ver[ALPHABET_LEN];//массив, где next_ver[i] - номер вершины, в которую мы перейдём по символу с номером i в алфавите
 	std::vector <int> num_pattern;	
 	bool flag = false; // является ли шаблоном
 	int suffix_link = -1; // суффиксная ссылка от этой вершины
@@ -21,7 +21,7 @@ public:
 };
 
 class Bohr{
-	std::vector <BohrVertex> bohr;
+	std::vector <BohrVertex> bohr;//вершины бора
 	std::vector < std::string > pattern;
 	int get_move(int v, int edge);
 	int get_suffix_link(int v);
@@ -82,19 +82,19 @@ int Bohr::get_suffix_link(int v){
 
 // перемещаемся по бору по ребру edge
 int Bohr::get_move(int v, int edge){
-	if (bohr[v].move[edge] == -1)
-		if (bohr[v].next_ver[edge] != -1)
+	if (bohr[v].move[edge] == -1)//если из текущей вершины нельзя переместиться
+		if (bohr[v].next_ver[edge] != -1)//пробуем переместиться из следующей вершины
 			bohr[v].move[edge] = bohr[v].next_ver[edge];
 		else
-			if (v == 0)
+			if (v == 0)//если корень
 				bohr[v].move[edge] = 0;
 			else
-				bohr[v].move[edge] = get_move(get_suffix_link(v), edge);
-   return bohr[v].move[edge];
+				bohr[v].move[edge] = get_move(get_suffix_link(v), edge);//если не корень перемещаемся по суффиксной ссылке
+	return bohr[v].move[edge];
 }
 
 void Bohr::res(int v, int i, std::vector <int>& array, std::vector <int> len){
-	 for(int u = v;u != 0;u = get_suffix_link(u))
+	 for(int u = v; u != 0; u = get_suffix_link(u))
 		if (bohr[u].flag){
 			for (const auto &j : bohr[u].num_pattern)
 				if ((i - len[j] < array.size())) 
@@ -106,7 +106,7 @@ std::vector <int> Bohr::patterns(std::map<char, int> m, std::stringstream& strin
 	std::vector < int > len;
 	int length = 0;
 	std::string buffer;
-	while (getline(string_pattern, buffer, joker)){
+	while (getline(string_pattern, buffer, joker)){//читаем из строки подобразцы по символу разделителю - джокеру
 		if (buffer.size() > 0){
 			length += buffer.size();
 			len.push_back(length);
@@ -118,9 +118,8 @@ std::vector <int> Bohr::patterns(std::map<char, int> m, std::stringstream& strin
 }
 
 void Bohr::print_res(const std::vector<int>& array, int t_size, int length){
-
 	for (int i = 0; i < t_size; i++)
-		if ((array[i] == pattern.size()) && (i + length <= t_size)){
+		if ((array[i] == pattern.size()) && (i + length <= t_size)){//проверяем условие того, что значение в массиве равно длине шаблона
 			std::cout << i + 1 << "\n";
 		}
 	
@@ -133,7 +132,7 @@ void Bohr::find_matches(std::map<char, int> m, std::string &s, std::vector <int>
 	for (int i = 0; i < lenght; i++){
 		char symb = s[i];
 		edge = m[symb];
-		u = get_move(u, edge);
+		u = get_move(u, edge);//перешли из u по ребру edge
 		res(u, i + 1, array, len);
 	}
 }

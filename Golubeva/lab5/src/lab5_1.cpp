@@ -8,10 +8,10 @@ std::vector <std::pair<int, int>> output;
 
 class BohrVertex{
 public:
-	int parent;
+	int parent;//вершина родитель
 	char value;
-	int next_ver[ALPHABET_LEN];
-	int numPattern = 0;
+	int next_ver[ALPHABET_LEN]; //массив, где next_ver[i] - номер вершины, в которую мы перейдём по символу с номером i в алфавите
+	int numPattern = 0; //номер строки-шаблона для вершины next_ver[i]
 	bool flag = false; // является ли шаблоном
 	int suffLink = -1; // суффиксная ссылка от этой вершины
 	int move[ALPHABET_LEN];
@@ -21,7 +21,7 @@ public:
 };
 
 class Bohr{
-	std::vector <BohrVertex> bohr;
+	std::vector <BohrVertex> bohr;//вершины бора
 	int get_move(int v, int edge);
 	int get_suffix_link(int v);
 	void res(std::vector <std::string>& patterns, int v, int i, std::string text);
@@ -78,14 +78,14 @@ int Bohr::get_suffix_link(int v){
 
 // перемещаемся по бору по ребру edge
 int Bohr::get_move(int v, int edge){
-	if (bohr[v].move[edge] == -1)
-		if (bohr[v].next_ver[edge] != -1)
+	if (bohr[v].move[edge] == -1)//если из текущей вершины нельзя переместиться
+		if (bohr[v].next_ver[edge] != -1)//пробуем переместиться из следующей вершины
 			bohr[v].move[edge] = bohr[v].next_ver[edge];
 		else
-			if (v == 0)
+			if (v == 0)//если корень
 				bohr[v].move[edge] = 0;
 			else
-				bohr[v].move[edge] = get_move(get_suffix_link(v), edge);
+				bohr[v].move[edge] = get_move(get_suffix_link(v), edge);//если не корень перемещаемся по суффиксной ссылке
 	return bohr[v].move[edge];
 }
 
@@ -104,7 +104,7 @@ void Bohr::find_matches(std::vector <std::string> patterns, std::string s, std::
 	for (int i = 0; i < len; i++){
 		char symb = s[i];
 		edge = m[symb];
-		u = get_move(u, edge);
+		u = get_move(u, edge);//перешли из u по ребру edge
 		res(patterns, u, i + 1, s);
 	}
 }
