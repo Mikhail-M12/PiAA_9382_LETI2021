@@ -1,0 +1,7 @@
+Ссылка на онлайн-компилятор
+
+Основной алгоритм
+https://replit.com/@lastrise/AhoKorasik1#main.cpp
+
+Модифицированный алгоритм
+https://replit.com/@lastrise/AhoKorasik2#main.cpp
