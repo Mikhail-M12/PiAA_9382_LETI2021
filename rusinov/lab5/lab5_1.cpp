@@ -259,57 +259,48 @@ void Bohr::doAlgorithm() {
         std::cout << "--------КОНЕЦ ПЕРЕХОДА--------\n";
 #endif
 
-        if (vertexes[vertex].isTerminal) {
 
-            int indexOfCurrentPattern = i - (int) patterns[vertexes[vertex].patternNumber].size() + 1;
-            if (numOfLastPattern != - 1 && indexOfCurrentPattern < indexOfLastPattern + patterns[numOfLastPattern].size()) {
+        bool maxSizePatternMarked = false;
 
 #ifdef DEBUG
-                std::cout << "Индекс прошлого найденного образца: " << indexOfLastPattern << "\n";
-                std::cout << "Размер прошлого найденного образца: " << patterns[vertexes[vertex].patternNumber].size() << "\n";
-                std::cout << "Индекс текущего найденного образца: " << indexOfCurrentPattern << "\n";
-                std::cout << "Прошлый и текущий образцы пересекаются, так как индекс"
-                             " текущего образца попал в область прошлого образца" << "\n";
+        std::cout << "--------ПОИСК ХОРОШИХ ССЫЛОК--------\n";
 #endif
 
-                crosses.insert(numOfLastPattern);
-                crosses.insert(vertexes[vertex].patternNumber);
-            }
+        for (int link = vertex; link; link = getGoodSuffixLink(link)) {
 
-            numOfLastPattern = vertexes[vertex].patternNumber;
-            indexOfLastPattern = i - (int) patterns[numOfLastPattern].size() + 1;
-
-#ifdef DEBUG
-            std::cout << "--------ПОИСК ХОРОШИХ ССЫЛОК--------\n";
-            std::cout << "Так как новый узел терминальный, то необходимо вычислить хорошие суффиксные ссылки,"
-                         " поскольку в образец могут входить другие образцы\n";
-#endif
-
-            auto innerPatterns = std::vector<int>();
-
-            // Все внутренние шаблоны (хорошие суффиксные ссылки) точно пересекаются
-            // Если в innerPatterns будет > 1 элемента, значит нужно добавить все эти элементы в множество пересекающихся
-
-            for (int link = vertex; link; link = getGoodSuffixLink(link)) {
+            if (vertexes[link].isTerminal) {
                 int patternNumber = vertexes[link].patternNumber;
-
-                innerPatterns.push_back(patternNumber);
-
                 int indexOfPattern = i - (int) patterns[patternNumber].size() + 2;
+
 #ifdef DEBUG
                 std::cout << "■ По индексу " << indexOfPattern << " располагается шаблон " << patterns[patternNumber] << "\n";
 #endif
+
+                if (numOfLastPattern != - 1 && indexOfPattern < indexOfLastPattern + patterns[numOfLastPattern].size()) {
+#ifdef DEBUG
+                    std::cout << "Индекс прошлого найденного образца: " << indexOfLastPattern << "\n";
+                std::cout << "Размер прошлого найденного образца: " << patterns[vertexes[vertex].patternNumber].size() << "\n";
+                std::cout << "Индекс текущего найденного образца: " << indexOfPattern << "\n";
+                std::cout << "Прошлый и текущий образцы пересекаются, так как индекс"
+                             " текущего образца попал в область прошлого образца" << "\n";
+#endif
+                    crosses.insert(numOfLastPattern);
+                    crosses.insert(vertexes[link].patternNumber);
+                }
+
                 result.emplace_back(indexOfPattern, patternNumber + 1);
+
+                if (!maxSizePatternMarked) {
+                    numOfLastPattern = patternNumber;
+                    indexOfLastPattern = indexOfPattern;
+                    maxSizePatternMarked = true;
+                }
             }
-
-            if (innerPatterns.size() > 1)
-                for (auto p : innerPatterns) crosses.insert(p);
-
+        }
 
 #ifdef DEBUG
-            std::cout << "-----КОНЕЦ ПОИСКА ХОРОШИХ ССЫЛОК-----\n";
+        std::cout << "-----КОНЕЦ ПОИСКА ХОРОШИХ ССЫЛОК-----\n";
 #endif
-        }
     }
 
     std::sort(result.begin(), result.end(), resultComparator);
@@ -318,14 +309,17 @@ void Bohr::doAlgorithm() {
         std::cout << pair.first << " " << pair.second << std::endl;
     }
 
+#ifdef DEBUG
     std::cout << "Пересекающиеся шаблоны: ";
     for (auto cross : crosses) {
         std::cout << patterns[cross] << ", ";
     }
 
-    if (crosses.empty()) std::cout << " нет\n";
+    if (crosses.empty())
+        std::cout << " нет\n";
 
     std::cout << "\nКоличество узлов в автомате " << vertexes.size() << "\n";
+#endif
 
 }
 

@@ -92,12 +92,12 @@ void Bohr::addStringToBohr(const std::string &string) {
             vertexes[number].nextVertices[ordinal] = (int) vertexes.size() - 1;
 
 #ifdef DEBUG
-            std::cout << "Для данного символа был добавлен узел в бор, его номер: " << vertexes[number].nextVertices[ordinal] << "\n\n";
+            std::cout << "Для данного символа был добавлен узел в бор, его но-мер: " << vertexes[number].nextVertices[ordinal] << "\n\n";
 #endif
 
         }
 #ifdef DEBUG
-        else { std::cout << "Узел для данного символа уже есть в боре, его номер: " << vertexes[number].nextVertices[ordinal] << "\n\n"; }
+        else { std::cout << "Узел для данного символа уже есть в боре, его но-мер: " << vertexes[number].nextVertices[ordinal] << "\n\n"; }
 #endif
         number = vertexes[number].nextVertices[ordinal];
     }
@@ -112,39 +112,37 @@ void Bohr::addStringToBohr(const std::string &string) {
 
 int Bohr::getSuffixLink(int vertex) {
 
-    if (vertexes[vertex].suffixLink == -1 || vertexes[vertex].symbol == joker) {
-
 #ifdef DEBUG
-        std::cout << "\nВычисляется суффиксная ссылка для узла: " << vertex << "\n";
+    std::cout << "\nВычисляется суффиксная ссылка для узла: " << vertex << "\n";
 #endif
 
-        if (vertex == 0 || vertexes[vertex].parent == 0) {
+    if (vertex == 0 || vertexes[vertex].parent == 0) {
 
 #ifdef DEBUG
-            std::cout << "Узел корневой или первый после корня, поэтому суффиксная ссылка - 0\n";
+        std::cout << "Узел корневой или первый после корня, поэтому суффиксная ссылка - 0\n";
 #endif
-            vertexes[vertex].suffixLink = 0;
+        vertexes[vertex].suffixLink = 0;
+    }
+    else {
+        int parent = vertexes[vertex].parent;
+        if (vertexes[vertex].symbol == joker) {
+            char symbol = symbolsUnderJoker[numOfSymbolUnderJoker--];
+#ifdef DEBUG
+            std::cout << "Для вычисления суффиксной ссылки узла нужно совер-шить переход"
+                         " по суффиксной ссылке родителя " << parent << " по символу ПОД ДЖОКЕРОМ в тексте '" << symbol << "'\n";
+#endif
+            vertexes[vertex].suffixLink = getTransition(getSuffixLink(parent), symbol);
         }
         else {
-            int parent = vertexes[vertex].parent;
-            if (vertexes[vertex].symbol == joker) {
-                char symbol = symbolsUnderJoker[numOfSymbolUnderJoker--];
+            char symbol = vertexes[vertex].symbol;
 #ifdef DEBUG
-                std::cout << "Для вычисления суффиксной ссылки узла нужно совершить переход"
-                             " по суффиксной ссылке родителя " << parent << " по символу ПОД ДЖОКЕРОМ в тексте '" << symbol << "'\n";
+            std::cout << "Для вычисления суффиксной ссылки узла нужно совер-шить переход"
+                         " по суффиксной ссылке родителя " << parent << " по СТАТИЧНОМУ символу '" << symbol << "'\n";
 #endif
-                vertexes[vertex].suffixLink = getTransition(getSuffixLink(parent), symbol);
-            }
-            else {
-                char symbol = vertexes[vertex].symbol;
-#ifdef DEBUG
-                std::cout << "Для вычисления суффиксной ссылки узла нужно совершить переход"
-                             " по суффиксной ссылке родителя " << parent << " по СТАТИЧНОМУ символу '" << symbol << "'\n";
-#endif
-                vertexes[vertex].suffixLink = getTransition(getSuffixLink(parent), symbol);
-            }
+            vertexes[vertex].suffixLink = getTransition(getSuffixLink(parent), symbol);
         }
     }
+
 
 #ifdef DEBUG
     std::cout << "■ Суффиксная ссылка узла " << vertex << " - " << vertexes[vertex].suffixLink << "\n";
@@ -161,41 +159,39 @@ int Bohr::getTransition(int vertex, char symbol) {
     std::cout << "\nВыполняется переход по символу '" << symbol << "'" << " из узла " << vertex << "\n";
 #endif
 
-    if (vertexes[vertex].transitions[ordinal] == -1 || vertexes[vertex].symbol == joker) {
 
 #ifdef DEBUG
         std::cout << "Для данного символа из данного узла не вычислен переход\n";
 #endif
 
-        if (vertexes[vertex].nextVertices[ordinal] != -1) {
-            int nextVertex = vertexes[vertex].nextVertices[ordinal];
+    if (vertexes[vertex].nextVertices[ordinal] != -1) {
+        int nextVertex = vertexes[vertex].nextVertices[ordinal];
 #ifdef DEBUG
-            std::cout << "Из данного узла по данному символу возможно совершить переход в узел " << nextVertex << "\n";
+        std::cout << "Из данного узла по данному символу возможно совершить переход в узел " << nextVertex << "\n";
 #endif
-            vertexes[vertex].transitions[ordinal] = nextVertex;
-        }
+        vertexes[vertex].transitions[ordinal] = nextVertex;
+    }
 
-        else if (vertexes[vertex].nextVertices[5] != -1) {
-            int nextVertex = vertexes[vertex].nextVertices[5];
+    else if (vertexes[vertex].nextVertices[5] != -1) {
+        int nextVertex = vertexes[vertex].nextVertices[5];
 #ifdef DEBUG
-            std::cout << "Из данного узла возможно совершить переход по джокеру в узел" << nextVertex << "\n";
+        std::cout << "Из данного узла возможно совершить переход по джокеру в узел" << nextVertex << "\n";
 #endif
-            vertexes[vertex].transitions[ordinal] = nextVertex;
-        }
+        vertexes[vertex].transitions[ordinal] = nextVertex;
+    }
 
+    else {
+        if (vertex == 0) {
+#ifdef DEBUG
+            std::cout << "Данный узел является корнем, и невозможно совершить переход по заданному символу, поэтому переход будет в узел 0\n";
+#endif
+            vertexes[vertex].transitions[ordinal] = 0;
+        }
         else {
-            if (vertex == 0) {
 #ifdef DEBUG
-                std::cout << "Данный узел является корнем, и невозможно совершить переход по заданному символу, поэтому переход будет в узел 0\n";
+            std::cout << "Невозможно совершить переход по заданному символу из заданного узла, поэтому необходимо вычислить переход по суффиксной ссылке\n";
 #endif
-                vertexes[vertex].transitions[ordinal] = 0;
-            }
-            else {
-#ifdef DEBUG
-                std::cout << "Невозможно совершить переход по заданному символу из заданного узла, поэтому необходимо вычислить переход по суффиксной ссылке\n";
-#endif
-                vertexes[vertex].transitions[ordinal] = getTransition(getSuffixLink(vertex), symbol);
-            }
+            vertexes[vertex].transitions[ordinal] = getTransition(getSuffixLink(vertex), symbol);
         }
     }
 
@@ -226,9 +222,9 @@ void Bohr::doAlgorithm() {
 
         if (vertexes[vertex].symbol == joker) {
 #ifdef DEBUG
-            std::cout << "Был совершен переход по Джокеру, поэтому рассматриваемый символ"
+            std::cout << "Был совершен переход по Джокеру, поэтому рассматри-ваемый символ"
                          " был добавлен в список символов, которые находились 'под джокером'"
-                         ", чтобы была возможность вычислить суффиксную ссылку\n";
+                         ", чтобы была возможность вычислить суффиксную ссыл-ку\n";
 #endif
             symbolsUnderJoker.push_back(symbol);
         }
@@ -266,12 +262,14 @@ void Bohr::doAlgorithm() {
     for (const auto& result : results)
         std::cout << result.first << std::endl;
 
+#ifdef DEBUG
     if (isThereCrossing)
         std::cout << "Имеются экземпляры образца " << pattern << ", которые пересекаются между собой" << std::endl;
     else
-        std::cout << "Нет экземпляров образца, которые пересекаются между собой" << std::endl;
+        std::cout << "Нет экземпляров образца, которые пересекаются между со-бой" << std::endl;
 
     std::cout << "\nКоличество узлов в автомате " << vertexes.size() << "\n";
+#endif
 
 }
 
