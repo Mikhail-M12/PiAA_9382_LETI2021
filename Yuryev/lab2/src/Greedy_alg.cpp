@@ -6,7 +6,7 @@
 
 #define pointFrom char
 #define pointTo char
-//#define ADDITIONAL_INFO
+#define ADDITIONAL_INFO
 
 class Edge // ориентированный путь между 2 вершинами
 {
@@ -40,7 +40,7 @@ class Point // вершина
 public:
     Point(char name): m_nameOfPoint(name)
     {};
-    
+
     void addWay(int length, char from, char to)
     {
         m_waysFromPoint.push_back(Edge(length, from, to));
@@ -64,36 +64,78 @@ int findNeededPointPosition(std::vector<Point>* allPoints, char pointName) // н
     return -1;
 }
 
-
-
-int findWayWithGreedyAlg(std::vector<Point>* allPoints, char currentPoint, char endPoint, std::string* currentWay)
+void printTabs(int n)
 {
+    for(int k = 0; k < n; k++)
+    {
+        std::cout << "  ";
+    }
+}
+
+
+int findWayWithGreedyAlg(std::vector<Point>* allPoints, char currentPoint, char endPoint, std::string* currentWay, int depth)
+{
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Рассмотрим вершину \'" << currentPoint << "\':" << std::endl;
+#endif
+
+
     if(std::count(currentWay->begin(), currentWay->end(), currentPoint)) // во избежание циклов вида: a->e, e->a
     {
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Эта вершина уже была рассмотрена -> возвращаемся на прошлый уровень." << std::endl;
+#endif
+
         return 1;
     }
 
     int pos = findNeededPointPosition(allPoints, currentPoint);
     std::vector<Edge>* waysVector = allPoints->at(pos).getVectorOfWays();
 
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Укажем, что мы ее посетили." << std::endl;
+#endif
     currentWay->push_back(currentPoint);
+
+
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Пройдем по всем путям из данной вершины:" << std::endl;
+#endif
 
     // идем по всем путям из данной вершины
     for(int k = 0; k < waysVector->size(); k++)
     {
         char nextPoint = waysVector->at(k).getPointTo();
 
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Рассмотрим путь \'" << currentPoint << "\'->\'" << nextPoint << "\':" << std::endl;
+#endif
+
         if(nextPoint == endPoint) // нашли путь
         {
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Этот путь привел нас к искомой вершине. Завершаем алгоритм." << std::endl;
+#endif
             currentWay->push_back(nextPoint);
             return 0;
         }
 
-        if(!findWayWithGreedyAlg(allPoints, nextPoint, endPoint, currentWay)) // рекурсивный вызов
+        if(!findWayWithGreedyAlg(allPoints, nextPoint, endPoint, currentWay, depth + 1)) // рекурсивный вызов
         {
             return 0;
         }
     }
+
+#ifdef ADDITIONAL_INFO
+    printTabs(depth);
+    std::cout << "Ни один из путей не привел нас к искомой вершине -> возвращаемся на прошлый уровень." << std::endl;
+#endif
 
     currentWay->pop_back();
     return 1;
@@ -109,94 +151,13 @@ int main()
     std::string way;
     char startPoint, endPoint;
 
-    char typeOfEnter = '0';
     char from, to;
     double size;
 
-    // считываем ввод пользователя
     #ifdef ADDITIONAL_INFO
-
-    while(true)
-    {
-        std::cout << "Вы хотите ввести данные с клавиатуры или из файла? (0/1)" << std::endl;
-        std::cout << "Для выхода из программы введите \"q\"." << std::endl;
-
-        std::cin >> typeOfEnter;
-        if (typeOfEnter == 'q')
-        {
-            std::cout << "Был введен символ\'q\'. Завершение программы..." << std::endl;
-            return 0;
-        }
-        else if(typeOfEnter == '1')
-        {
-            std::ifstream file("test1.txt");
-            
-            if (file) 
-            {
-                file >> startPoint >> endPoint;
-                while (!file.eof()) 
-                {
-                    file >> from >> to >> size;
-
-                    int position = findNeededPointPosition(&points, from);
-                    
-                    if(position == -1)  // случай, когда такая вершина еще не была добавлена
-                    {
-                        points.push_back(Point(from));
-                        points.at(points.size() - 1).addWay(size, from, to);
-                    }
-                    else
-                    {
-                        points.at(position).addWay(size, from, to);
-                    }
-
-                    if(findNeededPointPosition(&points, to) == -1) // если вершина прибытия еще не была добавлена (нужно т.к. не факт, что из нее что-то будет идти)
-                    {
-                        points.push_back(Point(to));
-                    }
-                }
-                break;
-            }
-        }
-        else if(typeOfEnter == '0')
-        {
-            std::cin >> startPoint >> endPoint;
-            while(std::cin >> from) 
-            {
-                if (from == '0')
-                    break;
-
-                std::cin >> to >> size;
-
-                int position = findNeededPointPosition(&points, from);
-                
-                if(position == -1)
-                {
-                    points.push_back(Point(from));
-                    points.at(points.size() - 1).addWay(size, from, to);
-                }
-                else
-                {
-                    points.at(position).addWay(size, from, to);
-                }
-
-                if(findNeededPointPosition(&points, to) == -1)
-                {
-                    points.push_back(Point(to));
-                }
-            }
-            break;
-        }
-        else
-        {
-            std::cin.ignore(32767,'\n');
-            std::cout << "Ввод некорректен. Попробуйте еще раз.\n" << std::endl;
-            continue;
-        }
-    }
+      std::cout << "Введите данные:" << std::endl;
     #endif
 
-    #ifndef ADDITIONAL_INFO
     std::cin >> startPoint >> endPoint;
     while(std::cin >> from) 
     {
@@ -206,7 +167,7 @@ int main()
         std::cin >> to >> size;
 
         int position = findNeededPointPosition(&points, from);
-        
+
         if(position == -1)
         {
             points.push_back(Point(from));
@@ -222,7 +183,6 @@ int main()
             points.push_back(Point(to));
         }
     }
-    #endif
 
     // сортировка путей в каждой из вершин по их размеру
     for(auto k = points.begin(); k != points.end(); k++)
@@ -230,7 +190,11 @@ int main()
         k->sortWaysBySize();
     }
 
-    findWayWithGreedyAlg(&points, startPoint, endPoint, &way);
+    findWayWithGreedyAlg(&points, startPoint, endPoint, &way, 0);
+
+    #ifdef ADDITIONAL_INFO
+      std::cout << "\n\nИтоговый путь:" << std::endl;
+    #endif
 
     std::cout << way << std::endl;
     return 0;
