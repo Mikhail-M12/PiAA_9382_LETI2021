@@ -1,0 +1,6 @@
+Include intermediate data?
+0 - No; 1 - Yes
+Choise task.
+ Task1 - 1; Task2 - 2
+Enter Data: 
+8
